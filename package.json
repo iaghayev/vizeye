@@ -1,0 +1,16 @@
+{
+  "name": "vizeye",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "docker compose -f infra/docker-compose.yml -f infra/docker-compose.dev.yml up",
+    "build": "docker compose -f infra/docker-compose.yml build",
+    "test": "cd apps/backend && npm test && cd ../agent && go test ./..."
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

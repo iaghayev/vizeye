@@ -1,0 +1,30 @@
+server:
+  url: "http://localhost:4000"
+  agent_key: ""
+  tls_skip_verify: false
+  connect_timeout_sec: 10
+  request_timeout_sec: 30
+  retry_max_attempts: 5
+  retry_initial_delay_ms: 500
+  retry_max_delay_sec: 60
+
+collection:
+  interval_sec: 30
+  heartbeat_interval_sec: 60
+  jitter_factor: 0.1
+  collectors:
+    cpu: true
+    memory: true
+    disk: true
+    load: true
+    network: true
+  disk_include_mounts: []
+  network_include_interfaces: []
+
+logging:
+  level: "info"
+  format: "json"
+
+agent:
+  version: "dev"
+  hostname: ""

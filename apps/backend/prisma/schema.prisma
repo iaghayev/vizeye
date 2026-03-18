@@ -1,0 +1,476 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  super_admin
+  admin
+  engineer
+  viewer
+}
+
+enum AssetType {
+  server
+  vm
+  network_device
+  container
+  website
+  service
+  other
+}
+
+enum Environment {
+  production
+  staging
+  development
+  test
+}
+
+enum Criticality {
+  critical
+  high
+  medium
+  low
+}
+
+enum MonitorType {
+  http
+  https
+  tcp
+  ping
+  ssl_expiry
+  dns
+}
+
+enum CheckStatus {
+  up
+  down
+  degraded
+  timeout
+  error
+  unknown
+}
+
+enum AlertTargetType {
+  org
+  asset
+  monitor
+}
+
+enum AlertSeverity {
+  critical
+  warning
+  info
+}
+
+enum AlertEventStatus {
+  firing
+  resolved
+}
+
+enum IncidentSeverity {
+  critical
+  high
+  medium
+  low
+}
+
+enum IncidentStatus {
+  open
+  acknowledged
+  in_progress
+  resolved
+  closed
+}
+
+enum IncidentSource {
+  alert
+  manual
+}
+
+enum NotificationChannelType {
+  email
+  slack
+  telegram
+  webhook
+  pagerduty
+}
+
+enum NotificationStatus {
+  pending
+  delivered
+  failed
+}
+
+enum WidgetType {
+  stat_card
+  metric_chart
+  uptime_bar
+  alert_list
+  incident_list
+  monitor_grid
+  custom
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  plan      String   @default("free")
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users                User[]
+  assets               Asset[]
+  monitors             Monitor[]
+  alertRules           AlertRule[]
+  alertEvents          AlertEvent[]
+  incidents            Incident[]
+  notificationChannels NotificationChannel[]
+  notificationLogs     NotificationLog[]
+  dashboards           Dashboard[]
+  widgets              Widget[]
+  auditLogs            AuditLog[]
+  metrics              Metric[]
+  checkResults         CheckResult[]
+  refreshTokens        RefreshToken[]
+  invitations          Invitation[]
+}
+
+model User {
+  id           String    @id @default(cuid())
+  orgId        String
+  email        String
+  passwordHash String
+  firstName    String?
+  lastName     String?
+  role         UserRole  @default(viewer)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  org                  Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  refreshTokens        RefreshToken[]
+  createdIncidents     Incident[]            @relation("CreatedByUser")
+  assignedIncidents    Incident[]            @relation("AssignedToUser")
+  acknowledgedIncidents Incident[]           @relation("AcknowledgedByUser")
+  resolvedIncidents    Incident[]            @relation("ResolvedByUser")
+  incidentComments     IncidentComment[]
+  createdDashboards    Dashboard[]
+  auditLogs            AuditLog[]
+
+  @@unique([orgId, email])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  orgId     String
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  orgId     String
+  email     String
+  role      UserRole
+  token     String   @unique
+  expiresAt DateTime
+  acceptedAt DateTime?
+  createdAt DateTime @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+model Asset {
+  id              String      @id @default(cuid())
+  orgId           String
+  name            String
+  assetType       AssetType
+  hostname        String?
+  ipAddress       String?
+  osName          String?
+  osVersion       String?
+  environment     Environment @default(production)
+  criticality     Criticality @default(medium)
+  location        String?
+  description     String?
+  metadata        Json        @default("{}")
+  tags            String[]    @default([])
+  agentId         String?     @unique
+  agentSecretHash String?
+  agentVersion    String?
+  lastSeenAt      DateTime?
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  org      Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  monitors Monitor[]
+  metrics  Metric[]
+  alertEvents AlertEvent[]
+  incidents   Incident[]
+
+  @@index([orgId])
+  @@index([agentId])
+}
+
+model Monitor {
+  id            String      @id @default(cuid())
+  orgId         String
+  assetId       String?
+  name          String
+  monitorType   MonitorType
+  target        String
+  intervalSec   Int         @default(60)
+  timeoutSec    Int         @default(10)
+  config        Json        @default("{}")
+  isActive      Boolean     @default(true)
+  lastStatus    CheckStatus?
+  lastCheckedAt DateTime?
+  nextCheckAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  org          Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  asset        Asset?        @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  checkResults CheckResult[]
+  alertRules   AlertRule[]
+  alertEvents  AlertEvent[]
+
+  @@index([orgId])
+  @@index([nextCheckAt])
+}
+
+model CheckResult {
+  id             String      @id @default(cuid())
+  monitorId      String
+  orgId          String
+  status         CheckStatus
+  responseTimeMs Int?
+  checkedAt      DateTime    @default(now())
+  metadata       Json        @default("{}")
+
+  monitor Monitor      @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, checkedAt(sort: Desc)])
+  @@index([orgId, checkedAt(sort: Desc)])
+}
+
+model Metric {
+  id         String   @id @default(cuid())
+  orgId      String
+  assetId    String
+  metricName String
+  value      Float
+  time       DateTime @default(now())
+  tags       Json     @default("{}")
+
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  asset Asset        @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId, metricName, time(sort: Desc)])
+  @@index([orgId, time(sort: Desc)])
+}
+
+model AlertRule {
+  id                     String          @id @default(cuid())
+  orgId                  String
+  name                   String
+  description            String?
+  targetType             String
+  targetId               String?
+  metricName             String?
+  condition              Json
+  severity               AlertSeverity
+  notificationChannelIds String[]        @default([])
+  isActive               Boolean         @default(true)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  monitor     Monitor?     @relation(fields: [targetId], references: [id], onDelete: SetNull)
+  alertEvents AlertEvent[]
+
+  @@index([orgId])
+}
+
+model AlertEvent {
+  id         String           @id @default(cuid())
+  orgId      String
+  ruleId     String
+  assetId    String?
+  monitorId  String?
+  status     AlertEventStatus @default(firing)
+  severity   AlertSeverity
+  message    String
+  value      Float?
+  firedAt    DateTime         @default(now())
+  resolvedAt DateTime?
+
+  org               Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  rule              AlertRule           @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  asset             Asset?              @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  monitor           Monitor?            @relation(fields: [monitorId], references: [id], onDelete: SetNull)
+  notificationLogs  NotificationLog[]
+
+  @@index([orgId, status])
+  @@index([orgId, firedAt(sort: Desc)])
+}
+
+model Incident {
+  id              String           @id @default(cuid())
+  orgId           String
+  title           String
+  description     String?
+  severity        IncidentSeverity
+  status          IncidentStatus   @default(open)
+  source          IncidentSource   @default(manual)
+  assetId         String?
+  createdById     String
+  assignedToId    String?
+  acknowledgedById String?
+  acknowledgedAt  DateTime?
+  resolvedById    String?
+  resolvedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  org          Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  asset        Asset?            @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  createdBy    User              @relation("CreatedByUser",      fields: [createdById],    references: [id])
+  assignedTo   User?             @relation("AssignedToUser",     fields: [assignedToId],   references: [id])
+  acknowledgedBy User?           @relation("AcknowledgedByUser", fields: [acknowledgedById], references: [id])
+  resolvedBy   User?             @relation("ResolvedByUser",     fields: [resolvedById],   references: [id])
+  comments     IncidentComment[]
+
+  @@index([orgId, status])
+  @@index([orgId, createdAt(sort: Desc)])
+}
+
+model IncidentComment {
+  id         String   @id @default(cuid())
+  incidentId String
+  userId     String
+  content    String
+  isSystem   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId],     references: [id])
+
+  @@index([incidentId])
+}
+
+model NotificationChannel {
+  id          String                  @id @default(cuid())
+  orgId       String
+  name        String
+  channelType NotificationChannelType
+  config      Json
+  isActive    Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  org              Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  notificationLogs NotificationLog[]
+
+  @@index([orgId])
+}
+
+model NotificationLog {
+  id           String             @id @default(cuid())
+  orgId        String
+  alertEventId String
+  channelId    String
+  status       String             @default("pending")
+  payload      Json               @default("{}")
+  response     Json?
+  error        String?
+  sentAt       DateTime?
+  createdAt    DateTime           @default(now())
+
+  org        Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  alertEvent AlertEvent          @relation(fields: [alertEventId], references: [id], onDelete: Cascade)
+  channel    NotificationChannel @relation(fields: [channelId],    references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([alertEventId])
+}
+
+model Dashboard {
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String
+  description String?
+  isDefault   Boolean  @default(false)
+  layout      Json     @default("[]")
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdBy User         @relation(fields: [createdById], references: [id])
+  widgets   Widget[]
+
+  @@index([orgId])
+}
+
+model Widget {
+  id          String     @id @default(cuid())
+  dashboardId String
+  orgId       String
+  title       String
+  widgetType  WidgetType
+  config      Json       @default("{}")
+  position    Json       @default("{}")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  dashboard Dashboard    @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  org       Organization @relation(fields: [orgId],       references: [id], onDelete: Cascade)
+
+  @@index([dashboardId])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  orgId        String
+  userId       String?
+  action       String
+  resourceType String?
+  resourceId   String?
+  metadata     Json     @default("{}")
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  org  Organization @relation(fields: [orgId],  references: [id], onDelete: Cascade)
+  user User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt(sort: Desc)])
+  @@index([orgId, action])
+}

@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Go binaries
+apps/agent/bin/
+
+# Environment files — NEVER commit these
+infra/.env
+infra/.env.dev
+apps/backend/.env
+apps/frontend/.env.local
+.env
+.env.local
+.env.*.local
+
+# SSL certs — generated locally
+infra/nginx/ssl/*.crt
+infra/nginx/ssl/*.key
+infra/nginx/ssl/*.pem
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.sqlite
+*.db
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Prisma
+apps/backend/prisma/migrations/*.sql.bak
+
+# Docker volumes (local only)
+postgres_data/
+redis_data/
+
+# Test coverage
+coverage/
+*.lcov
+
+# TypeScript cache
+*.tsbuildinfo
+
+# go.sum is committed but go vendor is not
+apps/agent/vendor/
