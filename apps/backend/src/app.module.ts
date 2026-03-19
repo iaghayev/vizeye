@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
+import { MulterModule } from '@nestjs/platform-express';
 import { validateConfig } from './app.config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -20,12 +21,20 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { HealthModule } from './modules/health/health.module';
 import { IngestModule } from './modules/ingest/ingest.module';
 import { WorkersModule } from './workers/workers.module';
+import { DiscoveryModule } from './modules/discovery/discovery.module';
+import { AgentDownloadModule } from './modules/agent-download/agent-download.module';
+import { EventsModule } from './modules/events/events.module';
+import { StatusPageModule } from './modules/status-page/status-page.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { ApiKeysModule } from './modules/api-keys/api-keys.module';
+import { SnmpController } from './modules/monitors/snmp.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: validateConfig }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ScheduleModule.forRoot(),
+    MulterModule.register({ dest: '/tmp' }),
     BullModule.forRoot({
       redis: {
         host:     process.env.REDIS_HOST     || 'localhost',
@@ -33,22 +42,13 @@ import { WorkersModule } from './workers/workers.module';
         password: process.env.REDIS_PASSWORD || undefined,
       },
     }),
-    PrismaModule,
-    AuthModule,
-    UsersModule,
-    OrganizationsModule,
-    AssetsModule,
-    MonitorsModule,
-    MetricsModule,
-    AlertsModule,
-    IncidentsModule,
-    NotificationsModule,
-    DashboardsModule,
-    AuditModule,
-    SettingsModule,
-    HealthModule,
-    IngestModule,
-    WorkersModule,
+    PrismaModule, AuthModule, UsersModule, OrganizationsModule,
+    AssetsModule, MonitorsModule, MetricsModule, AlertsModule,
+    IncidentsModule, NotificationsModule, DashboardsModule,
+    AuditModule, SettingsModule, HealthModule, IngestModule,
+    WorkersModule, DiscoveryModule, AgentDownloadModule,
+    EventsModule, StatusPageModule, MaintenanceModule, ApiKeysModule,
   ],
+  controllers: [SnmpController],
 })
 export class AppModule {}

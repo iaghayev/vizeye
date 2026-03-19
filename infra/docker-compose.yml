@@ -10,7 +10,7 @@ services:
       POSTGRES_USER:     ${POSTGRES_USER:-vizeye}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d:ro
@@ -33,7 +33,7 @@ services:
       --maxmemory-policy allkeys-lru
       --save 60 1
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -57,25 +57,25 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
-      - "${BACKEND_PORT:-4000}:4000"
+      - "4000:4000"
     depends_on:
       postgres: { condition: service_healthy }
       redis:    { condition: service_healthy }
     networks: [vizeye-internal, vizeye-public]
     healthcheck:
-      test: ["CMD-SHELL","wget -qO- http://localhost:4000/api/health || exit 1"]
+      test: ["CMD-SHELL","node -e \"require('http').get('http://localhost:4000/api/v1/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
       interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
 
   frontend:
     build:
       context: ../apps/frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL:  ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
-        NEXT_PUBLIC_WS_URL:   ${NEXT_PUBLIC_WS_URL:-ws://localhost:4000}
+        NEXT_PUBLIC_API_URL:  ${NEXT_PUBLIC_API_URL:-http://172.26.1.134:4000}
+        NEXT_PUBLIC_WS_URL:   ${NEXT_PUBLIC_WS_URL:-ws://172.26.1.134:4000}
         NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-VizEye}
     container_name: vizeye-frontend
     restart: unless-stopped
@@ -83,16 +83,10 @@ services:
       NODE_ENV: production
       PORT: 3000
     ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+      - "3000:3000"
     depends_on:
-      backend: { condition: service_healthy }
+      - backend
     networks: [vizeye-internal, vizeye-public]
-    healthcheck:
-      test: ["CMD-SHELL","wget -qO- http://localhost:3000/ || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
 volumes:
   postgres_data:

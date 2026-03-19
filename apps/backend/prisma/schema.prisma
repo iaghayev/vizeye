@@ -41,6 +41,8 @@ enum Criticality {
 }
 
 enum MonitorType {
+  agent
+  snmp
   http
   https
   tcp
@@ -137,13 +139,15 @@ model Organization {
   alertEvents          AlertEvent[]
   incidents            Incident[]
   notificationChannels NotificationChannel[]
+  refreshTokens       RefreshToken[]
+  maintenanceWindows   MaintenanceWindow[]
+  apiKeys              ApiKey[]
   notificationLogs     NotificationLog[]
   dashboards           Dashboard[]
   widgets              Widget[]
   auditLogs            AuditLog[]
   metrics              Metric[]
   checkResults         CheckResult[]
-  refreshTokens        RefreshToken[]
   invitations          Invitation[]
 }
 
@@ -257,6 +261,7 @@ model Monitor {
   org          Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   asset        Asset?        @relation(fields: [assetId], references: [id], onDelete: SetNull)
   checkResults CheckResult[]
+  maintenanceWindows MaintenanceWindow[] @relation("MonitorMaintenance")
   alertRules   AlertRule[]
   alertEvents  AlertEvent[]
 
@@ -473,4 +478,38 @@ model AuditLog {
 
   @@index([orgId, createdAt(sort: Desc)])
   @@index([orgId, action])
+}
+
+model MaintenanceWindow {
+  id          String    @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  recurring   Boolean   @default(false)
+  recurrence  Json?
+  monitors    Monitor[] @relation("MonitorMaintenance")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@index([orgId])
+  @@index([startTime, endTime])
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name        String
+  keyHash     String    @unique
+  keyPrefix   String
+  permissions Json      @default("{}")
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdBy   String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  @@index([orgId])
+  @@index([keyHash])
 }

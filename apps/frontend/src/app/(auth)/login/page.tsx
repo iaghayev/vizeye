@@ -1,70 +1,93 @@
 'use client';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import Link from 'next/link';
 import { useState } from 'react';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
-import { useAuth } from '@/lib/hooks/use-auth';
+import { Eye, EyeOff, Loader2, Lock, Mail, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const schema = z.object({ email:z.string().email(), password:z.string().min(1) });
-type Form = z.infer<typeof schema>;
+import { useAuth } from '@/lib/hooks/use-auth';
+import { useLang } from '@/lib/i18n/lang-context';
 
 export default function LoginPage() {
+  const { t } = useLang();
   const { login, isLoginPending } = useAuth();
-  const [show, setShow] = useState(false);
-  const { register, handleSubmit, formState:{errors} } = useForm<Form>({ resolver:zodResolver(schema) });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && password) login({ email, password });
+  };
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
-        <div className="flex items-center gap-2.5 mb-6">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="6" fill="rgba(6,182,212,0.12)"/>
-            <rect width="32" height="32" rx="6" stroke="rgba(6,182,212,0.3)" strokeWidth="1"/>
-            <circle cx="16" cy="16" r="5" stroke="#22D3EE" strokeWidth="1.5"/>
-            <circle cx="16" cy="16" r="2" fill="#22D3EE"/>
-          </svg>
-          <span className="font-display font-bold text-lg text-slate-100">VizEye</span>
+    <div className="animate-scale-in">
+      {/* Logo */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 bg-gradient-to-br from-cyan-500 to-blue-600 shadow-xl shadow-cyan-500/20">
+          <Eye size={26} className="text-white" strokeWidth={2.5} />
         </div>
-        <h2 className="font-display font-bold text-2xl text-slate-100 mb-1">Sign in</h2>
-        <p className="text-slate-500 text-sm">Enter your credentials to continue</p>
+        <h1 className="font-display font-bold text-2xl tracking-tight text-slate-100">
+          Viz<span className="text-cyan-400">Eye</span>
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">{t('auth.loginSubtitle')}</p>
       </div>
 
-      <form onSubmit={handleSubmit((d)=>login(d))} className="space-y-4">
-        <div className="space-y-1.5">
-          <label className="text-xs font-mono text-slate-400 uppercase tracking-wider">Email</label>
-          <input {...register('email')} type="email" placeholder="you@company.com"
-            className={cn('w-full px-3.5 py-2.5 rounded-md text-sm bg-canvas-elevated border text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-colors',
-              errors.email?'border-red-500/50':'border-edge hover:border-edge-bright')} />
-          {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-mono text-slate-400 uppercase tracking-wider">Password</label>
-          <div className="relative">
-            <input {...register('password')} type={show?'text':'password'} placeholder="••••••••"
-              className={cn('w-full px-3.5 py-2.5 pr-10 rounded-md text-sm bg-canvas-elevated border text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-colors',
-                errors.password?'border-red-500/50':'border-edge hover:border-edge-bright')} />
-            <button type="button" onClick={()=>setShow(v=>!v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-400">
-              {show?<EyeOff size={15}/>:<Eye size={15}/>}
-            </button>
+      {/* Form */}
+      <div className="p-6 rounded-2xl bg-canvas-surface/80 backdrop-blur-xl border border-edge shadow-2xl shadow-black/40">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-[10px] font-mono font-semibold uppercase tracking-[0.15em] text-slate-500 block mb-2">
+              {t('auth.email')}
+            </label>
+            <div className="relative">
+              <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" />
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="admin@acme.local" required
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm bg-canvas border border-edge text-slate-200 placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/40 transition-all" />
+            </div>
           </div>
+
+          <div>
+            <label className="text-[10px] font-mono font-semibold uppercase tracking-[0.15em] text-slate-500 block mb-2">
+              {t('auth.password')}
+            </label>
+            <div className="relative">
+              <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" />
+              <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••" required
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm bg-canvas border border-edge text-slate-200 placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/40 transition-all" />
+              <button type="button" onClick={() => setShowPw(!showPw)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400 transition-colors">
+                {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" disabled={isLoginPending || !email || !password}
+            className={cn(
+              'w-full py-2.5 rounded-xl text-sm font-semibold',
+              'bg-gradient-to-r from-cyan-500 to-blue-600 text-white',
+              'shadow-lg shadow-cyan-500/20 hover:shadow-xl hover:shadow-cyan-500/30',
+              'hover:from-cyan-400 hover:to-blue-500',
+              'focus:outline-none focus:ring-2 focus:ring-cyan-500/40',
+              'transition-all duration-300',
+              'disabled:opacity-60 disabled:cursor-not-allowed',
+              'flex items-center justify-center gap-2 group',
+            )}>
+            {isLoginPending ? <Loader2 size={16} className="animate-spin" /> : (
+              <>{t('auth.signIn')}<ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" /></>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-4 pt-4 border-t border-edge/60 text-center">
+          <p className="text-[10px] font-mono text-slate-600 uppercase tracking-wider mb-1.5">Demo</p>
+          <p className="text-[11px] font-mono text-slate-500">
+            admin@acme.local / <span className="text-cyan-500/70">Demo1234!</span>
+          </p>
         </div>
+      </div>
 
-        <div className="rounded-md bg-cyan-500/5 border border-cyan-500/15 px-3 py-2.5">
-          <p className="text-xs font-mono text-cyan-600">Demo: admin@acme.local / Demo1234!</p>
-        </div>
-
-        <button type="submit" disabled={isLoginPending}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-semibold bg-cyan-600 hover:bg-cyan-500 text-white border border-cyan-500 transition-all disabled:opacity-50">
-          {isLoginPending?<><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>Signing in...</>:<><LogIn size={15}/>Sign in</>}
-        </button>
-      </form>
-
-      <p className="mt-6 text-center text-sm text-slate-600">
-        No account? <Link href="/register" className="text-cyan-500 hover:text-cyan-400">Create organization</Link>
+      <p className="text-center text-[11px] text-slate-600 mt-6">
+        Powered by <span className="font-semibold text-slate-500">VizEye</span> <span className="text-slate-700">v1.0</span>
       </p>
     </div>
   );

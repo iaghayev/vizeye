@@ -1,15 +1,30 @@
-import { Controller,Get,Post,Param,Body,Query,Request,UseGuards } from '@nestjs/common';
-import { ApiTags,ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MetricsService } from './metrics.service';
-import { AgentKeyGuard } from '../../common/guards/agent-key.guard';
-import { Public } from '../../common/decorators/public.decorator';
-@ApiTags('metrics') @Controller('metrics')
+
+@ApiTags('metrics') @ApiBearerAuth() @Controller('metrics')
 export class MetricsController {
+
   constructor(private svc: MetricsService) {}
-  @Public() @UseGuards(AgentKeyGuard) @Post('../../ingest/metrics')
-  ingest(@Request() r:any,@Body() body:any){ return this.svc.ingest(r.asset,body.metrics||[]); }
-  @Public() @UseGuards(AgentKeyGuard) @Post('../../ingest/heartbeat')
-  heartbeat(@Request() r:any){ return this.svc.heartbeat(r.asset); }
-  @ApiBearerAuth() @Get(':assetId') query(@Param('assetId') id:string,@Query() q:any){ return this.svc.query(id,q); }
-  @ApiBearerAuth() @Get(':assetId/latest') latest(@Param('assetId') id:string){ return this.svc.getLatest(id); }
+
+  // Son metrik dəyərləri
+  @Get(':assetId/latest')
+  async latest(
+    @Param('assetId') assetId: string,
+    @Query('names') names?: string,
+  ) {
+    const nameList = names ? names.split(',').map(n => n.trim()) : undefined;
+    return this.svc.getLatest(assetId, nameList);
+  }
+
+  // Tarixçə metriklər
+  @Get(':assetId/history')
+  async history(
+    @Param('assetId') assetId: string,
+    @Query('minutes') minutes = '60',
+    @Query('names') names?: string,
+  ) {
+    const nameList = names ? names.split(',').map(n => n.trim()) : undefined;
+    return this.svc.getHistory(assetId, parseInt(minutes), nameList);
+  }
 }

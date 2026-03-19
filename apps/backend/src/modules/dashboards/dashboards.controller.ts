@@ -15,3 +15,4 @@ export class DashboardsController {
   @Patch(':id/widgets/:wid') @Roles('engineer') updateW(@Request() r:any,@Param('id') id:string,@Param('wid') wid:string,@Body() dto:any){ return this.svc.updateWidget(r.user.orgId,id,wid,dto); }
   @Delete(':id/widgets/:wid') @Roles('engineer') removeW(@Request() r:any,@Param('id') id:string,@Param('wid') wid:string){ return this.svc.removeWidget(r.user.orgId,id,wid); }
 }
+// Bu faylı dəyişmirik — mövcud endpoint-lər işləyir

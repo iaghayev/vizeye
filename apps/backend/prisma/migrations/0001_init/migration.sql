@@ -1,0 +1,2 @@
+-- Migration placeholder
+-- Real schema created via prisma db push
