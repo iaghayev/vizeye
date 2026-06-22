@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kredit kalkulyatoru</title>
+<meta name="description" content="İpoteka və kredit üçün real aylıq ödənişi, sığortanı və əlavə ödənişlərlə vaxt və pul qənaətini hesablayan kalkulyator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ---- Tokens (transcribed from the committed palette) ---- */
+  :root{
+    --ground:#EEF1EE;          /* soft sage-neutral page */
+    --card:#FFFFFF;            /* white surfaces */
+    --ink:#15201C;             /* ink text */
+    --muted:#6E7A74;           /* muted text */
+    --accent:#116A50;          /* deep emerald: brand + savings */
+    --accent-deep:#0E5B45;     /* hero core depth */
+    --bronze:#A26A3C;          /* interest / cost */
+    --slate:#6E7E92;           /* insurance */
+    --principal:#2C3B34;       /* cost-bar base segment */
+
+    --line:rgba(21,32,28,0.09);
+    --line-strong:rgba(21,32,28,0.14);
+    --field:#F2F5F2;
+    --field-line:rgba(21,32,28,0.13);
+    --accent-wash:rgba(17,106,80,0.06);
+    --accent-ring:rgba(17,106,80,0.16);
+
+    --shadow-soft:0 1px 2px rgba(20,32,28,.04), 0 8px 20px -10px rgba(20,32,28,.12), 0 26px 50px -26px rgba(20,32,28,.12);
+    --shadow-hero:0 2px 4px rgba(20,32,28,.06), 0 16px 32px -12px rgba(14,72,55,.20), 0 34px 64px -30px rgba(14,72,55,.26);
+
+    --r-card:20px;
+    --r-shell:24px;
+    --r-core:18px;
+    --r-field:12px;
+
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ -webkit-text-size-adjust:100%; }
+
+  body{
+    margin:0;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size:16px;
+    line-height:1.5;
+    font-feature-settings:'tnum' 1, 'lnum' 1;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  .num{ font-variant-numeric:tabular-nums lining-nums; white-space:nowrap; }
+
+  .page{
+    max-width:1160px;
+    margin:0 auto;
+    padding:clamp(20px,4vw,46px) clamp(16px,4vw,40px) 60px;
+  }
+
+  /* ---- Masthead ---- */
+  .masthead{ margin-bottom:clamp(20px,3vw,30px); max-width:62ch; }
+  .eyebrow{
+    margin:0;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .masthead__eyebrow{ color:var(--accent); }
+  .masthead__title{
+    margin:.34em 0 .2em;
+    font-size:clamp(1.7rem,4.4vw,2.5rem);
+    font-weight:700;
+    letter-spacing:-.02em;
+    line-height:1.06;
+  }
+  .masthead__sub{
+    margin:0;
+    color:var(--muted);
+    font-size:clamp(.95rem,1.6vw,1.06rem);
+    max-width:54ch;
+  }
+
+  /* ---- Layout ---- */
+  .layout{
+    display:grid;
+    gap:20px;
+    grid-template-columns:1fr;
+    grid-template-areas:"hero" "inputs" "results";
+  }
+  @media (min-width:940px){
+    .layout{
+      gap:24px;
+      grid-template-columns:minmax(350px,388px) 1fr;
+      grid-template-areas:
+        "inputs hero"
+        "inputs results";
+      align-items:start;
+    }
+  }
+  .hero{ grid-area:hero; }
+  .inputs{ grid-area:inputs; display:flex; flex-direction:column; gap:18px; }
+  .results{ grid-area:results; display:flex; flex-direction:column; gap:20px; }
+
+  /* ---- Card base ---- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--r-card);
+    box-shadow:var(--shadow-soft);
+    padding:clamp(18px,2.4vw,26px);
+  }
+
+  /* ---- Hero: double-bezel machined card ---- */
+  .hero__shell{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--r-shell);
+    padding:10px;
+    box-shadow:var(--shadow-hero);
+  }
+  .hero__core{
+    background:var(--accent);
+    border-radius:var(--r-core);
+    padding:clamp(22px,3vw,32px) clamp(22px,3vw,34px) clamp(20px,2.6vw,28px);
+    color:#fff;
+    box-shadow:
+      inset 0 1.5px 0 0 rgba(255,255,255,.20),
+      inset 0 0 0 1px rgba(255,255,255,.05),
+      inset 0 -14px 28px -14px rgba(0,0,0,.34);
+  }
+  .hero__eyebrow{
+    margin:0 0 .5em;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.74);
+  }
+  .hero__figure{
+    margin:0;
+    font-weight:700;
+    letter-spacing:-.025em;
+    line-height:1;
+    font-size:clamp(2.75rem,7vw,4.1rem);
+  }
+  .hero__cur{ font-size:.42em; font-weight:600; margin-left:.12em; color:rgba(255,255,255,.82); }
+  .hero__break{
+    margin:.85em 0 0;
+    color:rgba(255,255,255,.78);
+    font-size:clamp(.86rem,1.5vw,.96rem);
+    font-weight:500;
+  }
+  .hero__break b{ color:#fff; font-weight:600; }
+
+  /* ---- Inputs form ---- */
+  .inputs__card{ display:flex; flex-direction:column; gap:22px; }
+  .group{ border:0; margin:0; padding:0; display:flex; flex-direction:column; gap:14px; }
+  .group__head{ display:flex; flex-direction:column; gap:3px; }
+  .group__hint{ margin:0; font-size:12.5px; color:var(--muted); }
+  .group + .group{ padding-top:20px; border-top:1px solid var(--line); }
+
+  .field{ display:flex; flex-direction:column; gap:7px; }
+  .field__label{ font-size:13.5px; font-weight:600; color:var(--ink); }
+  .field__control{ position:relative; display:flex; align-items:center; }
+  .field__input{
+    width:100%;
+    font:inherit;
+    font-weight:600;
+    font-variant-numeric:tabular-nums lining-nums;
+    color:var(--ink);
+    background:var(--field);
+    border:1px solid var(--field-line);
+    border-radius:var(--r-field);
+    padding:12px 40px 12px 14px;
+    transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .field__input::placeholder{ color:var(--muted); font-weight:500; }
+  .field__input:hover{ border-color:var(--line-strong); }
+  .field__input:focus{
+    outline:none;
+    background:var(--card);
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-ring);
+  }
+  .field__input[type="date"]{ padding-right:14px; }
+  .field__input::-webkit-outer-spin-button,
+  .field__input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .field__input[type="number"]{ -moz-appearance:textfield; appearance:textfield; }
+  .field__unit{
+    position:absolute;
+    right:14px;
+    pointer-events:none;
+    color:var(--muted);
+    font-weight:600;
+    font-size:14px;
+  }
+  .field-row{ display:grid; grid-template-columns:1.4fr 1fr; gap:12px; }
+
+  /* ---- Side note ---- */
+  .note{ display:flex; flex-direction:column; gap:10px; padding:18px 20px; }
+  .note p{ margin:0; font-size:12.8px; line-height:1.5; color:var(--muted); }
+  .note .note__head{ color:var(--ink); font-weight:600; font-size:13px; }
+
+  /* ---- Savings ---- */
+  .savings__figure{
+    margin:.5em 0 .28em;
+    color:var(--accent);
+    font-weight:700;
+    letter-spacing:-.02em;
+    line-height:1;
+    font-size:clamp(2rem,5vw,2.7rem);
+  }
+  .savings__figure .cur{ font-size:.46em; font-weight:600; margin-left:.1em; }
+  .savings__cap{ margin:0 0 18px; color:var(--muted); font-size:14px; font-weight:500; }
+  .savings__cap b{ color:var(--ink); font-weight:600; }
+  .tiles{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .tile{
+    background:var(--field);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:13px 15px;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .tile__label{ font-size:11.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+  .tile__value{ font-size:clamp(1.02rem,2vw,1.18rem); font-weight:700; letter-spacing:-.01em; }
+  .tile__sub{ font-size:12px; color:var(--muted); font-weight:500; }
+  .tile--interest .tile__value{ color:var(--bronze); }
+  .tile--insurance .tile__value{ color:var(--slate); }
+
+  /* ---- Section heading inside results cards ---- */
+  .card__head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px; }
+  .card__head .eyebrow{ color:var(--muted); }
+
+  /* ---- Comparison table ---- */
+  .compare__scroll{ overflow-x:auto; }
+  .ctab{ width:100%; border-collapse:collapse; min-width:340px; }
+  .ctab th, .ctab td{ padding:11px 12px; text-align:right; font-size:14px; }
+  .ctab thead th{
+    font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); border-bottom:1px solid var(--line);
+  }
+  .ctab tbody th{ text-align:left; font-weight:600; color:var(--ink); }
+  .ctab tbody td{ font-weight:600; font-variant-numeric:tabular-nums lining-nums; white-space:nowrap; }
+  .ctab tbody tr + tr th, .ctab tbody tr + tr td{ border-top:1px solid var(--line); }
+  .col-plan{ color:var(--accent); }
+  .ctab thead .col-plan{ color:var(--accent); }
+  .ctab .cell-plan{ background:var(--accent-wash); }
+  .ctab tbody tr td:first-of-type{ /* baseline column */ }
+
+  /* ---- Cost composition bar ---- */
+  .costs__total{ margin:0 0 14px; font-size:clamp(1.3rem,3vw,1.7rem); font-weight:700; letter-spacing:-.02em; }
+  .costs__total .cur{ font-size:.5em; font-weight:600; color:var(--muted); margin-left:.1em; }
+  .bar{
+    display:flex;
+    height:15px;
+    border-radius:999px;
+    overflow:hidden;
+    background:var(--field);
+    box-shadow:inset 0 0 0 1px var(--line);
+  }
+  .bar__seg{ height:100%; min-width:0; transition:width .6s var(--ease); }
+  .seg--principal{ background:var(--principal); }
+  .seg--interest{ background:var(--bronze); }
+  .seg--insurance{ background:var(--slate); }
+  .legend{ list-style:none; margin:18px 0 0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+  .legend li{ display:flex; flex-direction:column; gap:5px; }
+  .legend__top{ display:flex; align-items:center; gap:8px; }
+  .dot{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .dot--principal{ background:var(--principal); }
+  .dot--interest{ background:var(--bronze); }
+  .dot--insurance{ background:var(--slate); }
+  .legend__label{ font-size:12px; font-weight:600; color:var(--muted); }
+  .legend__value{ font-size:14.5px; font-weight:700; font-variant-numeric:tabular-nums lining-nums; }
+  .legend__pct{ font-size:12px; color:var(--muted); font-weight:500; }
+
+  /* ---- Schedule ---- */
+  .sched{ padding:0; overflow:hidden; }
+  .sched__sum{
+    list-style:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:clamp(18px,2.4vw,24px);
+    user-select:none;
+  }
+  .sched__sum::-webkit-details-marker{ display:none; }
+  .sched__sum .eyebrow{ color:var(--muted); }
+  .sched__meta{ margin-left:auto; font-size:13px; color:var(--muted); font-weight:500; font-variant-numeric:tabular-nums; }
+  .chev{
+    width:8px; height:8px; flex:none;
+    border-right:2px solid var(--muted);
+    border-bottom:2px solid var(--muted);
+    transform:rotate(45deg);
+    transition:transform .25s var(--ease);
+  }
+  .sched[open] .chev{ transform:rotate(225deg); }
+  .sched__wrap{ max-height:380px; overflow:auto; border-top:1px solid var(--line); }
+  .stab{ width:100%; border-collapse:collapse; }
+  .stab caption{ caption-side:top; text-align:left; padding:10px clamp(18px,2.4vw,24px); font-size:12px; color:var(--muted); }
+  .stab th, .stab td{ padding:9px 12px; font-size:13px; text-align:right; white-space:nowrap; }
+  .stab thead th{
+    position:sticky; top:0; z-index:1;
+    background:var(--card);
+    font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted);
+    box-shadow:0 1px 0 var(--line);
+  }
+  .stab tbody td{ font-variant-numeric:tabular-nums lining-nums; font-weight:500; }
+  .stab th:first-child, .stab td:first-child{ text-align:right; color:var(--muted); }
+  .stab th:nth-child(2), .stab td:nth-child(2){ text-align:left; }
+  .stab tbody tr:nth-child(even){ background:rgba(21,32,28,.022); }
+  .stab tbody tr:hover{ background:var(--accent-wash); }
+  .stab tbody td:last-child{ font-weight:600; }
+
+  .footer{ margin-top:34px; color:var(--muted); font-size:12.5px; line-height:1.55; max-width:70ch; }
+  .footer p{ margin:0 0 6px; }
+
+  a{ color:var(--accent); }
+
+  /* ---- Focus visibility ---- */
+  .sched__sum:focus-visible{ outline:2px solid var(--accent); outline-offset:-4px; border-radius:8px; }
+  a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* ---- Entrance motion ---- */
+  .rise{ opacity:0; transform:translateY(12px); animation:rise .7s var(--ease) forwards; animation-delay:var(--d,0s); }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+
+  @media (prefers-reduced-motion:reduce){
+    .rise{ animation:none; opacity:1; transform:none; }
+    .bar__seg{ transition:none; }
+    .chev{ transition:none; }
+    .field__input{ transition:none; }
+    *{ scroll-behavior:auto; }
+  }
+
+  @media (max-width:430px){
+    .field-row{ grid-template-columns:1fr; }
+    .legend{ grid-template-columns:1fr; gap:10px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead rise" style="--d:0s">
+      <p class="eyebrow masthead__eyebrow">Kredit planlaşdırma</p>
+      <h1 class="masthead__title">Kredit kalkulyatoru</h1>
+      <p class="masthead__sub">Aylıq real ödənişinizi — kredit və sığortanı birlikdə — hesablayın və əlavə ödənişlərlə nə qədər vaxta və pula qənaət etdiyinizi dəqiq görün.</p>
+    </header>
+
+    <main class="layout">
+      <!-- HERO -->
+      <section class="hero rise" style="--d:.06s" aria-labelledby="hero-label">
+        <div class="hero__shell">
+          <div class="hero__core">
+            <p class="hero__eyebrow" id="hero-label">Real aylıq ödəniş</p>
+            <p class="hero__figure num"><span id="realMonthly">0,00</span><span class="hero__cur">₼</span></p>
+            <p class="hero__break" id="realBreak">Kredit <b>0,00 ₼</b> + Sığorta <b>0,00 ₼</b></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- INPUTS -->
+      <aside class="inputs">
+        <form id="form" class="card inputs__card rise" style="--d:.12s" autocomplete="off">
+          <fieldset class="group">
+            <div class="group__head"><legend class="eyebrow">Kredit</legend></div>
+
+            <div class="field">
+              <label class="field__label" for="amount">Kredit məbləği</label>
+              <div class="field__control">
+                <input class="field__input" id="amount" name="amount" type="number" inputmode="decimal" min="0" step="100" value="105000">
+                <span class="field__unit" aria-hidden="true">₼</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="rate">İllik faiz</label>
+              <div class="field__control">
+                <input class="field__input" id="rate" name="rate" type="number" inputmode="decimal" min="0" step="0.1" value="8">
+                <span class="field__unit" aria-hidden="true">%</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="term">Müddət</label>
+              <div class="field__control">
+                <input class="field__input" id="term" name="term" type="number" inputmode="numeric" min="1" step="1" value="300">
+                <span class="field__unit" aria-hidden="true">ay</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="firstDate">İlk ödəniş tarixi</label>
+              <div class="field__control">
+                <input class="field__input" id="firstDate" name="firstDate" type="date" value="2026-07-01">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <div class="group__head">
+              <legend class="eyebrow">Əlavə ödənişlər</legend>
+              <p class="group__hint">Əsas borca yönəlir və müddəti qısaldır — aylıq ödənişi azaltmır.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="extraMonthly">Aylıq əlavə ödəniş</label>
+              <div class="field__control">
+                <input class="field__input" id="extraMonthly" name="extraMonthly" type="number" inputmode="decimal" min="0" step="10" value="500">
+                <span class="field__unit" aria-hidden="true">₼</span>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label class="field__label" for="lumpSum">Birdəfəlik əlavə</label>
+                <div class="field__control">
+                  <input class="field__input" id="lumpSum" name="lumpSum" type="number" inputmode="decimal" min="0" step="100" value="0">
+                  <span class="field__unit" aria-hidden="true">₼</span>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field__label" for="lumpMonth">Ödəniş ayı</label>
+                <div class="field__control">
+                  <input class="field__input" id="lumpMonth" name="lumpMonth" type="number" inputmode="numeric" min="1" step="1" value="12">
+                  <span class="field__unit" aria-hidden="true">ay</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <div class="group__head">
+              <legend class="eyebrow">Sığorta</legend>
+              <p class="group__hint">Aylıq haqlar, kredit ödənişinin üstünə əlavə olunur.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="propIns">Əmlak sığortası</label>
+              <div class="field__control">
+                <input class="field__input" id="propIns" name="propIns" type="number" inputmode="decimal" min="0" step="0.01" value="18.08">
+                <span class="field__unit" aria-hidden="true">₼</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="lifeIns">Həyat sığortası</label>
+              <div class="field__control">
+                <input class="field__input" id="lifeIns" name="lifeIns" type="number" inputmode="decimal" min="0" step="0.01" value="35.03">
+                <span class="field__unit" aria-hidden="true">₼</span>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+
+        <aside class="note card rise" style="--d:.18s">
+          <p class="note__head">Sığorta və erkən bağlanma</p>
+          <p>Həyat sığortasının son il hissəsi əvvəlcədən ödənilir, ona görə ilkin ödənişlər bir qədər yüksək olur. Qanuna görə kredit vaxtından əvvəl bağlanarsa, istifadə olunmamış hissə geri qaytarılır — buna görə erkən bağlanma sığortaya da qənaət edir.</p>
+        </aside>
+      </aside>
+
+      <!-- RESULTS -->
+      <section class="results">
+        <div class="card savings rise" style="--d:.18s" aria-labelledby="savings-label">
+          <p class="eyebrow" id="savings-label">Əlavə ödənişlərin nəticəsi</p>
+          <p class="savings__figure num"><span id="totalSaved">0,00</span><span class="cur">₼</span></p>
+          <p class="savings__cap" id="savingsCap">Krediti tez bağlayır.</p>
+          <div class="tiles">
+            <div class="tile tile--interest">
+              <span class="tile__label">Faizə qənaət</span>
+              <span class="tile__value num" id="interestSaved">0,00 ₼</span>
+            </div>
+            <div class="tile tile--insurance">
+              <span class="tile__label">Sığortaya qənaət</span>
+              <span class="tile__value num" id="insuranceSaved">0,00 ₼</span>
+            </div>
+            <div class="tile">
+              <span class="tile__label">Yeni müddət</span>
+              <span class="tile__value num" id="newTerm">0 ay</span>
+              <span class="tile__sub num" id="newTermSub"></span>
+            </div>
+            <div class="tile">
+              <span class="tile__label">Bağlanma tarixi</span>
+              <span class="tile__value num" id="payoffDate">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card compare rise" style="--d:.24s">
+          <div class="card__head"><p class="eyebrow">Müqayisə</p></div>
+          <div class="compare__scroll">
+            <table class="ctab">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Əlavəsiz</th>
+                  <th scope="col" class="col-plan">Əlavə ilə</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Müddət</th>
+                  <td class="num" id="cmpBaseTerm">—</td>
+                  <td class="num cell-plan col-plan" id="cmpPlanTerm">—</td>
+                </tr>
+                <tr>
+                  <th scope="row">Ödənilən faiz</th>
+                  <td class="num" id="cmpBaseInterest">—</td>
+                  <td class="num cell-plan col-plan" id="cmpPlanInterest">—</td>
+                </tr>
+                <tr>
+                  <th scope="row">Ödənilən sığorta</th>
+                  <td class="num" id="cmpBaseInsurance">—</td>
+                  <td class="num cell-plan col-plan" id="cmpPlanInsurance">—</td>
+                </tr>
+                <tr>
+                  <th scope="row">Real ümumi xərc</th>
+                  <td class="num" id="cmpBaseTotal">—</td>
+                  <td class="num cell-plan col-plan" id="cmpPlanTotal">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card costs rise" style="--d:.3s">
+          <div class="card__head">
+            <p class="eyebrow">Real ümumi xərcin tərkibi</p>
+          </div>
+          <p class="costs__total num"><span id="planTotalCost">0,00</span><span class="cur">₼</span></p>
+          <div class="bar" role="img" aria-label="Real ümumi xərcin əsas borc, faiz və sığorta üzrə bölgüsü" id="costBar">
+            <span class="bar__seg seg--principal" id="segPrincipal" style="width:0%"></span>
+            <span class="bar__seg seg--interest" id="segInterest" style="width:0%"></span>
+            <span class="bar__seg seg--insurance" id="segInsurance" style="width:0%"></span>
+          </div>
+          <ul class="legend">
+            <li>
+              <span class="legend__top"><span class="dot dot--principal"></span><span class="legend__label">Əsas borc</span></span>
+              <span class="legend__value num" id="legPrincipal">0,00 ₼</span>
+              <span class="legend__pct num" id="legPrincipalPct">0%</span>
+            </li>
+            <li>
+              <span class="legend__top"><span class="dot dot--interest"></span><span class="legend__label">Faiz</span></span>
+              <span class="legend__value num" id="legInterest">0,00 ₼</span>
+              <span class="legend__pct num" id="legInterestPct">0%</span>
+            </li>
+            <li>
+              <span class="legend__top"><span class="dot dot--insurance"></span><span class="legend__label">Sığorta</span></span>
+              <span class="legend__value num" id="legInsurance">0,00 ₼</span>
+              <span class="legend__pct num" id="legInsurancePct">0%</span>
+            </li>
+          </ul>
+        </div>
+
+        <details class="card sched rise" style="--d:.36s">
+          <summary class="sched__sum">
+            <span class="eyebrow">Ödəniş cədvəli</span>
+            <span class="sched__meta" id="schedMeta"></span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="sched__wrap">
+            <table class="stab">
+              <caption>Aktiv plan üzrə cədvəl. Məbləğlər ₼ ilə.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">№</th>
+                  <th scope="col">Tarix</th>
+                  <th scope="col">Ödəniş</th>
+                  <th scope="col">Əsas borc</th>
+                  <th scope="col">Faiz</th>
+                  <th scope="col">Qalıq</th>
+                </tr>
+              </thead>
+              <tbody id="schedBody"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Bütün hesablamalar cihazınızda aparılır; heç bir məlumat göndərilmir. Səhifə internetsiz də işləyir.</p>
+      <p>Nəticələr ilkin qiymətləndirmə üçündür və bankın rəsmi ödəniş cədvəlindən fərqlənə bilər.</p>
+    </footer>
+  </div>
+
+  <noscript>
+    <p style="padding:20px;text-align:center;color:#6E7A74;">Kalkulyatorun işləməsi üçün JavaScript aktiv olmalıdır.</p>
+  </noscript>
+
+  <script>
+  (function(){
+    "use strict";
+
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- math ---------- */
+    function round2(x){ return Math.round((x + Number.EPSILON) * 100) / 100; }
+
+    function amortize(P, R, N, extraMonthly, lumpSum, lumpMonth){
+      var r = R / 100 / 12;
+      var M;
+      if (r === 0) {
+        M = round2(P / N);
+      } else {
+        var pw = Math.pow(1 + r, N);
+        M = round2(P * (r * pw) / (pw - 1));
+      }
+
+      var balance = P;
+      var totalInterestCents = 0;
+      var month = 0;
+      var schedule = [];
+      var hardCap = Math.max(N, 1) + 2000;
+
+      while (balance > 0 && month < hardCap) {
+        month++;
+        var interest = round2(balance * r);
+        var regularPrincipal = round2(M - interest);
+        if (regularPrincipal < 0) regularPrincipal = 0;
+        var extraThisMonth = extraMonthly;
+        if (lumpMonth >= 1 && month === lumpMonth) extraThisMonth += lumpSum;
+        var principal = regularPrincipal + extraThisMonth;
+        var payment;
+        if (principal >= balance) {
+          principal = round2(balance);
+          payment = round2(principal + interest);
+          balance = 0;
+        } else {
+          payment = round2(M + extraThisMonth);
+          balance = round2(balance - principal);
+        }
+        totalInterestCents += Math.round(interest * 100);
+        schedule.push({ month: month, payment: payment, principal: principal, interest: interest, balance: balance });
+        if (balance <= 0) break;
+      }
+
+      return { M: M, months: month, totalInterest: totalInterestCents / 100, schedule: schedule };
+    }
+
+    /* ---------- formatting ---------- */
+    function fmtNum(n, dec){
+      if (dec === undefined) dec = 2;
+      if (!isFinite(n)) n = 0;
+      var neg = n < 0;
+      n = Math.abs(n);
+      var fixed = n.toFixed(dec);
+      var parts = fixed.split('.');
+      var int = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      var out = parts.length > 1 ? int + ',' + parts[1] : int;
+      return (neg ? '-' : '') + out;
+    }
+    function money(n, dec){ return fmtNum(n, dec) + ' ₼'; }
+
+    function fmtDuration(months){
+      months = Math.max(0, Math.round(months));
+      var y = Math.floor(months / 12);
+      var m = months % 12;
+      var parts = [];
+      if (y > 0) parts.push(y + ' il');
+      if (m > 0) parts.push(m + ' ay');
+      if (parts.length === 0) parts.push('0 ay');
+      return parts.join(' ');
+    }
+
+    /* ---------- dates ---------- */
+    function parseDateInput(v){
+      if (!v) return null;
+      var p = v.split('-');
+      if (p.length !== 3) return null;
+      var y = +p[0], m = +p[1], d = +p[2];
+      if (!y || !m || !d) return null;
+      return new Date(y, m - 1, d);
+    }
+    function addMonths(date, n){
+      var day = date.getDate();
+      var d = new Date(date.getFullYear(), date.getMonth(), 1);
+      d.setMonth(d.getMonth() + n);
+      var dim = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      d.setDate(Math.min(day, dim));
+      return d;
+    }
+    function fmtDate(date){
+      var dd = String(date.getDate()).padStart(2, '0');
+      var mm = String(date.getMonth() + 1).padStart(2, '0');
+      return dd + '.' + mm + '.' + date.getFullYear();
+    }
+
+    /* ---------- count-up ---------- */
+    function countUp(el, target){
+      var dur = 1000, start = null;
+      function ease(t){ return 1 - Math.pow(1 - t, 3); }
+      function frame(now){
+        if (start === null) start = now;
+        var t = Math.min(1, (now - start) / dur);
+        el.textContent = fmtNum(target * ease(t), 2);
+        if (t < 1) requestAnimationFrame(frame);
+        else el.textContent = fmtNum(target, 2);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    /* ---------- DOM refs ---------- */
+    function $(id){ return document.getElementById(id); }
+    var els = {
+      amount: $('amount'), rate: $('rate'), term: $('term'), firstDate: $('firstDate'),
+      extraMonthly: $('extraMonthly'), lumpSum: $('lumpSum'), lumpMonth: $('lumpMonth'),
+      propIns: $('propIns'), lifeIns: $('lifeIns'),
+      realMonthly: $('realMonthly'), realBreak: $('realBreak'),
+      totalSaved: $('totalSaved'), savingsCap: $('savingsCap'),
+      interestSaved: $('interestSaved'), insuranceSaved: $('insuranceSaved'),
+      newTerm: $('newTerm'), newTermSub: $('newTermSub'), payoffDate: $('payoffDate'),
+      cmpBaseTerm: $('cmpBaseTerm'), cmpPlanTerm: $('cmpPlanTerm'),
+      cmpBaseInterest: $('cmpBaseInterest'), cmpPlanInterest: $('cmpPlanInterest'),
+      cmpBaseInsurance: $('cmpBaseInsurance'), cmpPlanInsurance: $('cmpPlanInsurance'),
+      cmpBaseTotal: $('cmpBaseTotal'), cmpPlanTotal: $('cmpPlanTotal'),
+      planTotalCost: $('planTotalCost'),
+      segPrincipal: $('segPrincipal'), segInterest: $('segInterest'), segInsurance: $('segInsurance'),
+      legPrincipal: $('legPrincipal'), legInterest: $('legInterest'), legInsurance: $('legInsurance'),
+      legPrincipalPct: $('legPrincipalPct'), legInterestPct: $('legInterestPct'), legInsurancePct: $('legInsurancePct'),
+      schedMeta: $('schedMeta'), schedBody: $('schedBody')
+    };
+
+    function readNum(el, def, min){
+      var v = parseFloat(el.value);
+      if (isNaN(v)) v = def;
+      if (min !== undefined && v < min) v = min;
+      return v;
+    }
+
+    /* ---------- main ---------- */
+    function recompute(initial){
+      var amount = readNum(els.amount, 0, 0);
+      var rate = readNum(els.rate, 0, 0);
+      var term = Math.round(readNum(els.term, 1, 1));
+      var extraMonthly = readNum(els.extraMonthly, 0, 0);
+      var lumpSum = readNum(els.lumpSum, 0, 0);
+      var lumpMonth = Math.round(readNum(els.lumpMonth, 0, 0));
+      var prop = readNum(els.propIns, 0, 0);
+      var life = readNum(els.lifeIns, 0, 0);
+
+      var monthlyInsurance = round2(prop + life);
+
+      var base = amortize(amount, rate, term, 0, 0, 0);
+      var plan = amortize(amount, rate, term, extraMonthly, lumpSum, lumpMonth);
+
+      var M = base.M;
+      var realMonthly = round2(M + monthlyInsurance);
+
+      var baseIns = round2(monthlyInsurance * base.months);
+      var planIns = round2(monthlyInsurance * plan.months);
+      var insuranceSaved = round2(monthlyInsurance * (base.months - plan.months));
+      var interestSaved = round2(base.totalInterest - plan.totalInterest);
+      var totalSaved = round2(interestSaved + insuranceSaved);
+      var monthsSaved = base.months - plan.months;
+
+      var baseRealTotal = round2(amount + base.totalInterest + baseIns);
+      var planRealTotal = round2(amount + plan.totalInterest + planIns);
+
+      var firstDate = parseDateInput(els.firstDate.value);
+      var payoff = (firstDate && plan.months > 0) ? addMonths(firstDate, plan.months - 1) : null;
+
+      /* hero */
+      if (initial && !reduceMotion) {
+        countUp(els.realMonthly, realMonthly);
+        countUp(els.totalSaved, totalSaved);
+      } else {
+        els.realMonthly.textContent = fmtNum(realMonthly, 2);
+        els.totalSaved.textContent = fmtNum(totalSaved, 2);
+      }
+      els.realBreak.innerHTML = 'Kredit <b>' + money(M) + '</b> + Sığorta <b>' + money(monthlyInsurance) + '</b>';
+
+      /* savings */
+      if (monthsSaved > 0) {
+        els.savingsCap.innerHTML = 'Krediti <b>' + fmtDuration(monthsSaved) + '</b> tez bağlayır.';
+      } else {
+        els.savingsCap.textContent = 'Əlavə ödəniş daxil edin və qənaəti görün.';
+      }
+      els.interestSaved.textContent = money(interestSaved);
+      els.insuranceSaved.textContent = money(insuranceSaved);
+      els.newTerm.textContent = plan.months + ' ay';
+      els.newTermSub.textContent = plan.months > 0 ? fmtDuration(plan.months) : '';
+      els.payoffDate.textContent = payoff ? fmtDate(payoff) : '—';
+
+      /* comparison */
+      els.cmpBaseTerm.textContent = base.months + ' ay';
+      els.cmpPlanTerm.textContent = plan.months + ' ay';
+      els.cmpBaseInterest.textContent = money(base.totalInterest);
+      els.cmpPlanInterest.textContent = money(plan.totalInterest);
+      els.cmpBaseInsurance.textContent = money(baseIns);
+      els.cmpPlanInsurance.textContent = money(planIns);
+      els.cmpBaseTotal.textContent = money(baseRealTotal);
+      els.cmpPlanTotal.textContent = money(planRealTotal);
+
+      /* cost composition (active plan) */
+      var principalPart = amount;
+      var interestPart = plan.totalInterest;
+      var insurancePart = planIns;
+      var total = principalPart + interestPart + insurancePart;
+      els.planTotalCost.textContent = fmtNum(planRealTotal, 2);
+
+      var pPct = total > 0 ? principalPart / total * 100 : 0;
+      var iPct = total > 0 ? interestPart / total * 100 : 0;
+      var sPct = total > 0 ? insurancePart / total * 100 : 0;
+      els.segPrincipal.style.width = pPct + '%';
+      els.segInterest.style.width = iPct + '%';
+      els.segInsurance.style.width = sPct + '%';
+
+      els.legPrincipal.textContent = money(principalPart);
+      els.legInterest.textContent = money(interestPart);
+      els.legInsurance.textContent = money(insurancePart);
+      els.legPrincipalPct.textContent = fmtNum(pPct, 1) + '%';
+      els.legInterestPct.textContent = fmtNum(iPct, 1) + '%';
+      els.legInsurancePct.textContent = fmtNum(sPct, 1) + '%';
+
+      /* schedule (active plan) */
+      els.schedMeta.textContent = plan.months + ' ödəniş' + (payoff ? ' · ' + fmtDate(payoff) : '');
+      var rows = [];
+      for (var i = 0; i < plan.schedule.length; i++) {
+        var s = plan.schedule[i];
+        var d = firstDate ? fmtDate(addMonths(firstDate, s.month - 1)) : '—';
+        rows.push('<tr><td>' + s.month + '</td><td>' + d + '</td><td>' + fmtNum(s.payment, 2) +
+          '</td><td>' + fmtNum(s.principal, 2) + '</td><td>' + fmtNum(s.interest, 2) +
+          '</td><td>' + fmtNum(s.balance, 2) + '</td></tr>');
+      }
+      els.schedBody.innerHTML = rows.join('');
+    }
+
+    /* wire up live recompute */
+    var inputs = document.querySelectorAll('#form input');
+    for (var k = 0; k < inputs.length; k++) {
+      inputs[k].addEventListener('input', function(){ recompute(false); });
+      inputs[k].addEventListener('change', function(){ recompute(false); });
+    }
+
+    recompute(true);
+  })();
+  </script>
+</body>
+</html>
