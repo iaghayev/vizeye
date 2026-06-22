@@ -603,6 +603,7 @@
     "use strict";
 
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var heroAnimating = false;
 
     /* ---------- math ---------- */
     function round2(x){ return Math.round((x + Number.EPSILON) * 100) / 100; }
@@ -701,6 +702,7 @@
       var dur = 1000, start = null;
       function ease(t){ return 1 - Math.pow(1 - t, 3); }
       function frame(now){
+        if (!heroAnimating) return; /* superseded by a live recompute */
         if (start === null) start = now;
         var t = Math.min(1, (now - start) / dur);
         el.textContent = fmtNum(target * ease(t), 2);
@@ -772,9 +774,11 @@
 
       /* hero */
       if (initial && !reduceMotion) {
+        heroAnimating = true;
         countUp(els.realMonthly, realMonthly);
         countUp(els.totalSaved, totalSaved);
       } else {
+        heroAnimating = false; /* stop any in-flight count-up so it can't overwrite */
         els.realMonthly.textContent = fmtNum(realMonthly, 2);
         els.totalSaved.textContent = fmtNum(totalSaved, 2);
       }
