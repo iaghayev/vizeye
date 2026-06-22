@@ -91,13 +91,13 @@
   /* ---- Layout ---- */
   .layout{
     display:grid;
-    gap:16px;
+    gap:12px;
     grid-template-columns:1fr;
     grid-template-areas:"hero" "inputs" "results";
   }
   @media (min-width:940px){
     .layout{
-      gap:20px;
+      gap:14px;
       grid-template-columns:minmax(340px,380px) 1fr;
       grid-template-areas:
         "inputs hero"
@@ -106,8 +106,8 @@
     }
   }
   .hero{ grid-area:hero; }
-  .inputs{ grid-area:inputs; display:flex; flex-direction:column; gap:16px; }
-  .results{ grid-area:results; display:flex; flex-direction:column; gap:16px; }
+  .inputs{ grid-area:inputs; display:flex; flex-direction:column; gap:12px; }
+  .results{ grid-area:results; display:flex; flex-direction:column; gap:12px; }
 
   /* ---- Card base ---- */
   .card{
@@ -149,7 +149,7 @@
     font-weight:700;
     letter-spacing:-.025em;
     line-height:1;
-    font-size:clamp(2.2rem,5.2vw,3.1rem);
+    font-size:clamp(1.85rem,4.2vw,2.5rem);
   }
   .hero__cur{ font-size:.42em; font-weight:600; margin-left:.12em; color:rgba(255,255,255,.82); }
   .hero__break{
@@ -232,12 +232,12 @@
   }
   .eyebrow--accent{ color:var(--accent); }
   .savings__figure{
-    margin:.5em 0 .32em;
+    margin:.45em 0 .3em;
     color:var(--accent);
     font-weight:700;
     letter-spacing:-.02em;
     line-height:1;
-    font-size:clamp(1.55rem,3.4vw,1.95rem);
+    font-size:clamp(1.35rem,2.8vw,1.65rem);
   }
   .savings__figure .cur{ font-size:.46em; font-weight:600; margin-left:.1em; }
   .savings__cap{ margin:0; color:var(--muted); font-size:14px; font-weight:500; line-height:1.55; }
