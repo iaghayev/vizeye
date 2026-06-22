@@ -107,7 +107,7 @@
   }
   .hero{ grid-area:hero; }
   .inputs{ grid-area:inputs; display:flex; flex-direction:column; gap:18px; }
-  .results{ grid-area:results; display:flex; flex-direction:column; gap:20px; }
+  .results{ grid-area:results; display:flex; flex-direction:column; gap:22px; }
 
   /* ---- Card base ---- */
   .card{
@@ -209,33 +209,24 @@
   .note p{ margin:0; font-size:12.8px; line-height:1.5; color:var(--muted); }
   .note .note__head{ color:var(--ink); font-weight:600; font-size:13px; }
 
-  /* ---- Savings ---- */
+  /* ---- Savings (accent card) ---- */
+  .card--accent{
+    background:var(--accent-wash);
+    border-color:rgba(17,106,80,.20);
+    box-shadow:0 1px 2px rgba(20,32,28,.04), 0 10px 26px -14px rgba(14,72,55,.22);
+  }
+  .eyebrow--accent{ color:var(--accent); }
   .savings__figure{
-    margin:.5em 0 .28em;
+    margin:.5em 0 .32em;
     color:var(--accent);
     font-weight:700;
     letter-spacing:-.02em;
     line-height:1;
-    font-size:clamp(2rem,5vw,2.7rem);
+    font-size:clamp(1.95rem,4.6vw,2.5rem);
   }
   .savings__figure .cur{ font-size:.46em; font-weight:600; margin-left:.1em; }
-  .savings__cap{ margin:0 0 18px; color:var(--muted); font-size:14px; font-weight:500; }
+  .savings__cap{ margin:0; color:var(--muted); font-size:14px; font-weight:500; line-height:1.55; }
   .savings__cap b{ color:var(--ink); font-weight:600; }
-  .tiles{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-  .tile{
-    background:var(--field);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:13px 15px;
-    display:flex;
-    flex-direction:column;
-    gap:5px;
-  }
-  .tile__label{ font-size:11.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
-  .tile__value{ font-size:clamp(1.02rem,2vw,1.18rem); font-weight:700; letter-spacing:-.01em; }
-  .tile__sub{ font-size:12px; color:var(--muted); font-weight:500; }
-  .tile--interest .tile__value{ color:var(--bronze); }
-  .tile--insurance .tile__value{ color:var(--slate); }
 
   /* ---- Section heading inside results cards ---- */
   .card__head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px; }
@@ -243,26 +234,27 @@
 
   /* ---- Comparison table ---- */
   .compare__scroll{ overflow-x:auto; }
-  .ctab{ width:100%; border-collapse:collapse; min-width:340px; }
-  .ctab th, .ctab td{ padding:11px 12px; text-align:right; font-size:14px; }
+  .ctab{ width:100%; border-collapse:collapse; min-width:300px; }
+  .ctab th, .ctab td{ padding:13px 12px; text-align:right; font-size:14px; vertical-align:top; }
   .ctab thead th{
+    padding-top:0;
     font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
     color:var(--muted); border-bottom:1px solid var(--line);
   }
-  .ctab tbody th{ text-align:left; font-weight:600; color:var(--ink); }
-  .ctab tbody td{ font-weight:600; font-variant-numeric:tabular-nums lining-nums; white-space:nowrap; }
-  .ctab tbody tr + tr th, .ctab tbody tr + tr td{ border-top:1px solid var(--line); }
-  .col-plan{ color:var(--accent); }
   .ctab thead .col-plan{ color:var(--accent); }
+  .ctab tbody th{ text-align:left; font-weight:500; color:var(--muted); white-space:nowrap; }
+  .ctab tbody td{ font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums lining-nums; white-space:nowrap; }
+  .ctab tbody tr + tr th, .ctab tbody tr + tr td{ border-top:1px solid var(--line); }
   .ctab .cell-plan{ background:var(--accent-wash); }
-  .ctab tbody tr td:first-of-type{ /* baseline column */ }
+  .ctab__total th, .ctab__total td{ border-top:1.5px solid var(--line-strong); }
+  .ctab__total th{ color:var(--ink); font-weight:600; }
+  .delta{ display:block; margin-top:3px; font-size:12px; font-weight:600; color:var(--accent); letter-spacing:0; }
 
   /* ---- Cost composition bar ---- */
-  .costs__total{ margin:0 0 14px; font-size:clamp(1.3rem,3vw,1.7rem); font-weight:700; letter-spacing:-.02em; }
-  .costs__total .cur{ font-size:.5em; font-weight:600; color:var(--muted); margin-left:.1em; }
+  .card__hint{ font-size:12px; color:var(--muted); font-weight:500; }
   .bar{
     display:flex;
-    height:15px;
+    height:14px;
     border-radius:999px;
     overflow:hidden;
     background:var(--field);
@@ -272,16 +264,15 @@
   .seg--principal{ background:var(--principal); }
   .seg--interest{ background:var(--bronze); }
   .seg--insurance{ background:var(--slate); }
-  .legend{ list-style:none; margin:18px 0 0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
-  .legend li{ display:flex; flex-direction:column; gap:5px; }
-  .legend__top{ display:flex; align-items:center; gap:8px; }
-  .dot{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .legend{ list-style:none; margin:20px 0 0; padding:0; display:flex; flex-direction:column; gap:13px; }
+  .legend li{ display:flex; align-items:center; gap:10px; }
+  .dot{ width:9px; height:9px; border-radius:3px; flex:none; }
   .dot--principal{ background:var(--principal); }
   .dot--interest{ background:var(--bronze); }
   .dot--insurance{ background:var(--slate); }
-  .legend__label{ font-size:12px; font-weight:600; color:var(--muted); }
-  .legend__value{ font-size:14.5px; font-weight:700; font-variant-numeric:tabular-nums lining-nums; }
-  .legend__pct{ font-size:12px; color:var(--muted); font-weight:500; }
+  .legend__label{ font-size:13.5px; font-weight:500; color:var(--ink); }
+  .legend__pct{ font-size:12px; font-weight:500; color:var(--muted); }
+  .legend__value{ margin-left:auto; font-size:14px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums lining-nums; white-space:nowrap; }
 
   /* ---- Schedule ---- */
   .sched{ padding:0; overflow:hidden; }
@@ -345,7 +336,6 @@
 
   @media (max-width:430px){
     .field-row{ grid-template-columns:1fr; }
-    .legend{ grid-template-columns:1fr; gap:10px; }
   }
 </style>
 </head>
@@ -471,33 +461,14 @@
 
       <!-- RESULTS -->
       <section class="results">
-        <div class="card savings rise" style="--d:.18s" aria-labelledby="savings-label">
-          <p class="eyebrow" id="savings-label">Əlavə ödənişlərin nəticəsi</p>
+        <div class="card card--accent savings rise" style="--d:.18s" aria-labelledby="savings-label">
+          <p class="eyebrow eyebrow--accent" id="savings-label">Əlavə ödənişlə qənaət</p>
           <p class="savings__figure num"><span id="totalSaved">0,00</span><span class="cur">₼</span></p>
           <p class="savings__cap" id="savingsCap">Krediti tez bağlayır.</p>
-          <div class="tiles">
-            <div class="tile tile--interest">
-              <span class="tile__label">Faizə qənaət</span>
-              <span class="tile__value num" id="interestSaved">0,00 ₼</span>
-            </div>
-            <div class="tile tile--insurance">
-              <span class="tile__label">Sığortaya qənaət</span>
-              <span class="tile__value num" id="insuranceSaved">0,00 ₼</span>
-            </div>
-            <div class="tile">
-              <span class="tile__label">Yeni müddət</span>
-              <span class="tile__value num" id="newTerm">0 ay</span>
-              <span class="tile__sub num" id="newTermSub"></span>
-            </div>
-            <div class="tile">
-              <span class="tile__label">Bağlanma tarixi</span>
-              <span class="tile__value num" id="payoffDate">—</span>
-            </div>
-          </div>
         </div>
 
         <div class="card compare rise" style="--d:.24s">
-          <div class="card__head"><p class="eyebrow">Müqayisə</p></div>
+          <div class="card__head"><p class="eyebrow">Əlavəsiz və əlavə ilə</p></div>
           <div class="compare__scroll">
             <table class="ctab">
               <thead>
@@ -511,22 +482,22 @@
                 <tr>
                   <th scope="row">Müddət</th>
                   <td class="num" id="cmpBaseTerm">—</td>
-                  <td class="num cell-plan col-plan" id="cmpPlanTerm">—</td>
+                  <td class="cell-plan"><span class="num" id="cmpPlanTerm">—</span></td>
                 </tr>
                 <tr>
                   <th scope="row">Ödənilən faiz</th>
                   <td class="num" id="cmpBaseInterest">—</td>
-                  <td class="num cell-plan col-plan" id="cmpPlanInterest">—</td>
+                  <td class="cell-plan"><span class="num" id="cmpPlanInterest">—</span><span class="delta num" id="dInterest"></span></td>
                 </tr>
                 <tr>
                   <th scope="row">Ödənilən sığorta</th>
                   <td class="num" id="cmpBaseInsurance">—</td>
-                  <td class="num cell-plan col-plan" id="cmpPlanInsurance">—</td>
+                  <td class="cell-plan"><span class="num" id="cmpPlanInsurance">—</span><span class="delta num" id="dInsurance"></span></td>
                 </tr>
-                <tr>
+                <tr class="ctab__total">
                   <th scope="row">Real ümumi xərc</th>
                   <td class="num" id="cmpBaseTotal">—</td>
-                  <td class="num cell-plan col-plan" id="cmpPlanTotal">—</td>
+                  <td class="cell-plan"><span class="num" id="cmpPlanTotal">—</span><span class="delta num" id="dTotal"></span></td>
                 </tr>
               </tbody>
             </table>
@@ -535,9 +506,9 @@
 
         <div class="card costs rise" style="--d:.3s">
           <div class="card__head">
-            <p class="eyebrow">Real ümumi xərcin tərkibi</p>
+            <p class="eyebrow">Xərcin tərkibi</p>
+            <p class="card__hint">Əlavə ödəniş planı</p>
           </div>
-          <p class="costs__total num"><span id="planTotalCost">0,00</span><span class="cur">₼</span></p>
           <div class="bar" role="img" aria-label="Real ümumi xərcin əsas borc, faiz və sığorta üzrə bölgüsü" id="costBar">
             <span class="bar__seg seg--principal" id="segPrincipal" style="width:0%"></span>
             <span class="bar__seg seg--interest" id="segInterest" style="width:0%"></span>
@@ -545,19 +516,22 @@
           </div>
           <ul class="legend">
             <li>
-              <span class="legend__top"><span class="dot dot--principal"></span><span class="legend__label">Əsas borc</span></span>
-              <span class="legend__value num" id="legPrincipal">0,00 ₼</span>
+              <span class="dot dot--principal"></span>
+              <span class="legend__label">Əsas borc</span>
               <span class="legend__pct num" id="legPrincipalPct">0%</span>
+              <span class="legend__value num" id="legPrincipal">0,00 ₼</span>
             </li>
             <li>
-              <span class="legend__top"><span class="dot dot--interest"></span><span class="legend__label">Faiz</span></span>
-              <span class="legend__value num" id="legInterest">0,00 ₼</span>
+              <span class="dot dot--interest"></span>
+              <span class="legend__label">Faiz</span>
               <span class="legend__pct num" id="legInterestPct">0%</span>
+              <span class="legend__value num" id="legInterest">0,00 ₼</span>
             </li>
             <li>
-              <span class="legend__top"><span class="dot dot--insurance"></span><span class="legend__label">Sığorta</span></span>
-              <span class="legend__value num" id="legInsurance">0,00 ₼</span>
+              <span class="dot dot--insurance"></span>
+              <span class="legend__label">Sığorta</span>
               <span class="legend__pct num" id="legInsurancePct">0%</span>
+              <span class="legend__value num" id="legInsurance">0,00 ₼</span>
             </li>
           </ul>
         </div>
@@ -720,13 +694,11 @@
       propIns: $('propIns'), lifeIns: $('lifeIns'),
       realMonthly: $('realMonthly'), realBreak: $('realBreak'),
       totalSaved: $('totalSaved'), savingsCap: $('savingsCap'),
-      interestSaved: $('interestSaved'), insuranceSaved: $('insuranceSaved'),
-      newTerm: $('newTerm'), newTermSub: $('newTermSub'), payoffDate: $('payoffDate'),
       cmpBaseTerm: $('cmpBaseTerm'), cmpPlanTerm: $('cmpPlanTerm'),
       cmpBaseInterest: $('cmpBaseInterest'), cmpPlanInterest: $('cmpPlanInterest'),
       cmpBaseInsurance: $('cmpBaseInsurance'), cmpPlanInsurance: $('cmpPlanInsurance'),
       cmpBaseTotal: $('cmpBaseTotal'), cmpPlanTotal: $('cmpPlanTotal'),
-      planTotalCost: $('planTotalCost'),
+      dInterest: $('dInterest'), dInsurance: $('dInsurance'), dTotal: $('dTotal'),
       segPrincipal: $('segPrincipal'), segInterest: $('segInterest'), segInsurance: $('segInsurance'),
       legPrincipal: $('legPrincipal'), legInterest: $('legInterest'), legInsurance: $('legInsurance'),
       legPrincipalPct: $('legPrincipalPct'), legInterestPct: $('legInterestPct'), legInsurancePct: $('legInsurancePct'),
@@ -786,17 +758,13 @@
 
       /* savings */
       if (monthsSaved > 0) {
-        els.savingsCap.innerHTML = 'Krediti <b>' + fmtDuration(monthsSaved) + '</b> tez bağlayır.';
+        els.savingsCap.innerHTML = 'Krediti <b>' + fmtDuration(monthsSaved) + '</b> tez bağlayır' +
+          (payoff ? ' · bağlanma <b>' + fmtDate(payoff) + '</b>' : '') + '.';
       } else {
-        els.savingsCap.textContent = 'Əlavə ödəniş daxil edin və qənaəti görün.';
+        els.savingsCap.textContent = 'Əlavə ödəniş əlavə edin və qənaətinizi görün.';
       }
-      els.interestSaved.textContent = money(interestSaved);
-      els.insuranceSaved.textContent = money(insuranceSaved);
-      els.newTerm.textContent = plan.months + ' ay';
-      els.newTermSub.textContent = plan.months > 0 ? fmtDuration(plan.months) : '';
-      els.payoffDate.textContent = payoff ? fmtDate(payoff) : '—';
 
-      /* comparison */
+      /* comparison (baseline vs plan; qənaət deltalarla göstərilir) */
       els.cmpBaseTerm.textContent = base.months + ' ay';
       els.cmpPlanTerm.textContent = plan.months + ' ay';
       els.cmpBaseInterest.textContent = money(base.totalInterest);
@@ -805,13 +773,15 @@
       els.cmpPlanInsurance.textContent = money(planIns);
       els.cmpBaseTotal.textContent = money(baseRealTotal);
       els.cmpPlanTotal.textContent = money(planRealTotal);
+      els.dInterest.textContent = interestSaved > 0 ? '−' + money(interestSaved) : '';
+      els.dInsurance.textContent = insuranceSaved > 0 ? '−' + money(insuranceSaved) : '';
+      els.dTotal.textContent = totalSaved > 0 ? '−' + money(totalSaved) : '';
 
       /* cost composition (active plan) */
       var principalPart = amount;
       var interestPart = plan.totalInterest;
       var insurancePart = planIns;
       var total = principalPart + interestPart + insurancePart;
-      els.planTotalCost.textContent = fmtNum(planRealTotal, 2);
 
       var pPct = total > 0 ? principalPart / total * 100 : 0;
       var iPct = total > 0 ? interestPart / total * 100 : 0;
