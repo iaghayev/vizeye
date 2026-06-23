@@ -63,8 +63,23 @@
     padding:clamp(20px,4vw,46px) clamp(16px,4vw,40px) 60px;
   }
 
-  /* ---- Masthead ---- */
-  .masthead{ margin-bottom:clamp(14px,2.2vw,22px); max-width:62ch; }
+  /* ---- Masthead / topbar ---- */
+  .topbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px 24px; flex-wrap:wrap; margin-bottom:clamp(14px,2.2vw,22px); }
+  .masthead{ max-width:62ch; }
+  .controls{ display:flex; gap:10px; flex-wrap:wrap; flex:none; }
+  .control{ display:flex; flex-direction:column; gap:5px; }
+  .control__label{ font-size:10px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); padding-left:2px; }
+  .control__select{
+    font:inherit; font-size:13.5px; font-weight:600; color:var(--ink);
+    background-color:var(--card); border:1px solid var(--field-line); border-radius:10px;
+    padding:8px 32px 8px 12px; cursor:pointer; line-height:1.2;
+    -webkit-appearance:none; -moz-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236E7A74' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center;
+    transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .control__select:hover{ border-color:var(--line-strong); }
+  .control__select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-ring); }
   .eyebrow{
     margin:0;
     font-size:11px;
@@ -356,10 +371,33 @@
 </head>
 <body>
   <div class="page">
-    <header class="masthead rise" style="--d:0s">
-      <p class="eyebrow masthead__eyebrow">Kredit planlaşdırma</p>
-      <h1 class="masthead__title">Kredit kalkulyatoru</h1>
-      <p class="masthead__sub">Aylıq real ödənişinizi — kredit və sığortanı birlikdə — hesablayın və əlavə ödənişlərlə nə qədər vaxta və pula qənaət etdiyinizi dəqiq görün.</p>
+    <header class="topbar rise" style="--d:0s">
+      <div class="masthead">
+        <p class="eyebrow masthead__eyebrow" data-i18n="mast_eyebrow">Kredit planlaşdırma</p>
+        <h1 class="masthead__title" data-i18n="mast_title">Kredit kalkulyatoru</h1>
+        <p class="masthead__sub" data-i18n="mast_sub">Aylıq real ödənişinizi — kredit və sığortanı birlikdə — hesablayın və əlavə ödənişlərlə nə qədər vaxta və pula qənaət etdiyinizi dəqiq görün.</p>
+      </div>
+      <div class="controls">
+        <label class="control">
+          <span class="control__label" data-i18n="ui_language">Dil</span>
+          <select class="control__select" id="lang">
+            <option value="az">Azərbaycan</option>
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+        <label class="control">
+          <span class="control__label" data-i18n="ui_currency">Valyuta</span>
+          <select class="control__select" id="currency">
+            <option value="AZN" data-sym="₼">₼ AZN</option>
+            <option value="USD" data-sym="$">$ USD</option>
+            <option value="EUR" data-sym="€">€ EUR</option>
+            <option value="GBP" data-sym="£">£ GBP</option>
+            <option value="RUB" data-sym="₽">₽ RUB</option>
+            <option value="TRY" data-sym="₺">₺ TRY</option>
+          </select>
+        </label>
+      </div>
     </header>
 
     <main class="layout">
@@ -367,8 +405,8 @@
       <section class="hero rise" style="--d:.06s" aria-labelledby="hero-label">
         <div class="hero__shell">
           <div class="hero__core">
-            <p class="hero__eyebrow" id="hero-label">Real aylıq ödəniş</p>
-            <p class="hero__figure num"><span id="realMonthly">—</span><span class="hero__cur">₼</span></p>
+            <p class="hero__eyebrow" id="hero-label" data-i18n="hero_eyebrow">Real aylıq ödəniş</p>
+            <p class="hero__figure num"><span id="realMonthly">—</span><span class="hero__cur" data-cur>₼</span></p>
             <p class="hero__break" id="realBreak">Kredit məbləği, illik faiz və müddəti daxil edin.</p>
           </div>
         </div>
@@ -378,18 +416,18 @@
       <aside class="inputs">
         <form id="form" class="card inputs__card rise" style="--d:.12s" autocomplete="off">
           <fieldset class="group">
-            <div class="group__head"><legend class="eyebrow">Kredit</legend></div>
+            <div class="group__head"><legend class="eyebrow" data-i18n="grp_loan">Kredit</legend></div>
 
             <div class="field">
-              <label class="field__label" for="amount">Kredit məbləği</label>
+              <label class="field__label" for="amount" data-i18n="f_amount">Kredit məbləği</label>
               <div class="field__control">
                 <input class="field__input" id="amount" name="amount" type="number" inputmode="decimal" min="0" step="100">
-                <span class="field__unit" aria-hidden="true">₼</span>
+                <span class="field__unit" data-cur aria-hidden="true">₼</span>
               </div>
             </div>
 
             <div class="field">
-              <label class="field__label" for="rate">İllik faiz</label>
+              <label class="field__label" for="rate" data-i18n="f_rate">İllik faiz</label>
               <div class="field__control">
                 <input class="field__input" id="rate" name="rate" type="number" inputmode="decimal" min="0" step="0.1">
                 <span class="field__unit" aria-hidden="true">%</span>
@@ -397,15 +435,15 @@
             </div>
 
             <div class="field">
-              <label class="field__label" for="term">Müddət</label>
+              <label class="field__label" for="term" data-i18n="f_term">Müddət</label>
               <div class="field__control">
                 <input class="field__input" id="term" name="term" type="number" inputmode="numeric" min="1" step="1">
-                <span class="field__unit" aria-hidden="true">ay</span>
+                <span class="field__unit" data-i18n="unit_month" aria-hidden="true">ay</span>
               </div>
             </div>
 
             <div class="field">
-              <label class="field__label" for="firstDate">İlk ödəniş tarixi</label>
+              <label class="field__label" for="firstDate" data-i18n="f_firstDate">İlk ödəniş tarixi</label>
               <div class="field__control">
                 <input class="field__input field__input--plain" id="firstDate" name="firstDate" type="date">
               </div>
@@ -414,28 +452,28 @@
 
           <fieldset class="group">
             <div class="group__head">
-              <legend class="eyebrow">Əlavə ödənişlər</legend>
-              <p class="group__hint">İstəyə bağlı. Əsas borca yönəlir və müddəti qısaldır — aylıq ödənişi azaltmır.</p>
+              <legend class="eyebrow" data-i18n="grp_extra">Əlavə ödənişlər</legend>
+              <p class="group__hint" data-i18n="grp_extra_hint">İstəyə bağlı. Əsas borca yönəlir və müddəti qısaldır — aylıq ödənişi azaltmır.</p>
             </div>
 
             <div class="field">
-              <label class="field__label" for="extraMonthly">Aylıq əlavə ödəniş</label>
+              <label class="field__label" for="extraMonthly" data-i18n="f_extraMonthly">Aylıq əlavə ödəniş</label>
               <div class="field__control">
                 <input class="field__input" id="extraMonthly" name="extraMonthly" type="number" inputmode="decimal" min="0" step="10">
-                <span class="field__unit" aria-hidden="true">₼</span>
+                <span class="field__unit" data-cur aria-hidden="true">₼</span>
               </div>
             </div>
 
             <div class="field-row">
               <div class="field">
-                <label class="field__label" for="lumpSum">Birdəfəlik əlavə</label>
+                <label class="field__label" for="lumpSum" data-i18n="f_lumpSum">Birdəfəlik əlavə</label>
                 <div class="field__control">
                   <input class="field__input" id="lumpSum" name="lumpSum" type="number" inputmode="decimal" min="0" step="100">
-                  <span class="field__unit" aria-hidden="true">₼</span>
+                  <span class="field__unit" data-cur aria-hidden="true">₼</span>
                 </div>
               </div>
               <div class="field">
-                <label class="field__label" for="lumpMonth">Neçənci ay</label>
+                <label class="field__label" for="lumpMonth" data-i18n="f_lumpMonth">Neçənci ay</label>
                 <div class="field__control">
                   <input class="field__input field__input--plain" id="lumpMonth" name="lumpMonth" type="number" inputmode="numeric" min="1" step="1" placeholder="məs. 12">
                 </div>
@@ -446,71 +484,71 @@
 
           <fieldset class="group">
             <div class="group__head">
-              <legend class="eyebrow">Sığorta</legend>
-              <p class="group__hint">Aylıq haqlar, kredit ödənişinin üstünə əlavə olunur.</p>
+              <legend class="eyebrow" data-i18n="grp_ins">Sığorta</legend>
+              <p class="group__hint" data-i18n="grp_ins_hint">Aylıq haqlar, kredit ödənişinin üstünə əlavə olunur.</p>
             </div>
 
             <div class="field">
-              <label class="field__label" for="propIns">Əmlak sığortası</label>
+              <label class="field__label" for="propIns" data-i18n="f_prop">Əmlak sığortası</label>
               <div class="field__control">
                 <input class="field__input" id="propIns" name="propIns" type="number" inputmode="decimal" min="0" step="0.01">
-                <span class="field__unit" aria-hidden="true">₼</span>
+                <span class="field__unit" data-cur aria-hidden="true">₼</span>
               </div>
             </div>
 
             <div class="field">
-              <label class="field__label" for="lifeIns">Həyat sığortası</label>
+              <label class="field__label" for="lifeIns" data-i18n="f_life">Həyat sığortası</label>
               <div class="field__control">
                 <input class="field__input" id="lifeIns" name="lifeIns" type="number" inputmode="decimal" min="0" step="0.01">
-                <span class="field__unit" aria-hidden="true">₼</span>
+                <span class="field__unit" data-cur aria-hidden="true">₼</span>
               </div>
             </div>
           </fieldset>
         </form>
 
         <aside class="note card rise" style="--d:.18s">
-          <p class="note__head">Sığorta və erkən bağlanma</p>
-          <p>Həyat sığortasının son il hissəsi əvvəlcədən ödənilir, ona görə ilkin ödənişlər bir qədər yüksək olur. Qanuna görə kredit vaxtından əvvəl bağlanarsa, istifadə olunmamış hissə geri qaytarılır — buna görə erkən bağlanma sığortaya da qənaət edir.</p>
+          <p class="note__head" data-i18n="note_head">Sığorta və erkən bağlanma</p>
+          <p data-i18n="note_body">Həyat sığortasının son il hissəsi əvvəlcədən ödənilir, ona görə ilkin ödənişlər bir qədər yüksək olur. Qanuna görə kredit vaxtından əvvəl bağlanarsa, istifadə olunmamış hissə geri qaytarılır — buna görə erkən bağlanma sığortaya da qənaət edir.</p>
         </aside>
       </aside>
 
       <!-- RESULTS -->
       <section class="results">
         <div class="card card--accent savings rise" style="--d:.18s" aria-labelledby="savings-label">
-          <p class="eyebrow eyebrow--accent" id="savings-label">Əlavə ödənişlə qənaət</p>
-          <p class="savings__figure num"><span id="totalSaved">—</span><span class="cur">₼</span></p>
+          <p class="eyebrow eyebrow--accent" id="savings-label" data-i18n="savings_eyebrow">Əlavə ödənişlə qənaət</p>
+          <p class="savings__figure num"><span id="totalSaved">—</span><span class="cur" data-cur>₼</span></p>
           <p class="savings__cap" id="savingsCap">Krediti tez bağlayır.</p>
         </div>
 
         <div class="card compare rise" style="--d:.24s">
-          <div class="card__head"><p class="eyebrow">Əlavəsiz və əlavə ilə</p></div>
+          <div class="card__head"><p class="eyebrow" data-i18n="cmp_eyebrow">Əlavəsiz və əlavə ilə</p></div>
           <div class="compare__scroll">
             <table class="ctab">
               <thead>
                 <tr>
                   <th scope="col"></th>
-                  <th scope="col">Əlavəsiz</th>
-                  <th scope="col" class="col-plan">Əlavə ilə</th>
+                  <th scope="col" data-i18n="cmp_base">Əlavəsiz</th>
+                  <th scope="col" class="col-plan" data-i18n="cmp_plan">Əlavə ilə</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">Müddət</th>
+                  <th scope="row" data-i18n="cmp_term">Müddət</th>
                   <td class="num" id="cmpBaseTerm">—</td>
                   <td class="cell-plan"><span class="num" id="cmpPlanTerm">—</span></td>
                 </tr>
                 <tr>
-                  <th scope="row">Ödənilən faiz</th>
+                  <th scope="row" data-i18n="cmp_interest">Ödənilən faiz</th>
                   <td class="num" id="cmpBaseInterest">—</td>
                   <td class="cell-plan"><span class="num" id="cmpPlanInterest">—</span><span class="delta num" id="dInterest"></span></td>
                 </tr>
                 <tr>
-                  <th scope="row">Ödənilən sığorta</th>
+                  <th scope="row" data-i18n="cmp_insurance">Ödənilən sığorta</th>
                   <td class="num" id="cmpBaseInsurance">—</td>
                   <td class="cell-plan"><span class="num" id="cmpPlanInsurance">—</span><span class="delta num" id="dInsurance"></span></td>
                 </tr>
                 <tr class="ctab__total">
-                  <th scope="row">Real ümumi xərc</th>
+                  <th scope="row" data-i18n="cmp_total">Real ümumi xərc</th>
                   <td class="num" id="cmpBaseTotal">—</td>
                   <td class="cell-plan"><span class="num" id="cmpPlanTotal">—</span><span class="delta num" id="dTotal"></span></td>
                 </tr>
@@ -521,8 +559,8 @@
 
         <div class="card costs rise" style="--d:.3s">
           <div class="card__head">
-            <p class="eyebrow">Xərcin tərkibi</p>
-            <p class="card__hint">Əlavə ödəniş planı</p>
+            <p class="eyebrow" data-i18n="costs_eyebrow">Xərcin tərkibi</p>
+            <p class="card__hint" data-i18n="costs_hint">Əlavə ödəniş planı</p>
           </div>
           <div class="bar" role="img" aria-label="Real ümumi xərcin əsas borc, faiz və sığorta üzrə bölgüsü" id="costBar">
             <span class="bar__seg seg--principal" id="segPrincipal" style="width:0%"></span>
@@ -532,42 +570,42 @@
           <ul class="legend">
             <li>
               <span class="dot dot--principal"></span>
-              <span class="legend__label">Əsas borc</span>
+              <span class="legend__label" data-i18n="leg_principal">Əsas borc</span>
               <span class="legend__pct num" id="legPrincipalPct">0%</span>
-              <span class="legend__value num" id="legPrincipal">0,00 ₼</span>
+              <span class="legend__value num" id="legPrincipal">—</span>
             </li>
             <li>
               <span class="dot dot--interest"></span>
-              <span class="legend__label">Faiz</span>
+              <span class="legend__label" data-i18n="leg_interest">Faiz</span>
               <span class="legend__pct num" id="legInterestPct">0%</span>
-              <span class="legend__value num" id="legInterest">0,00 ₼</span>
+              <span class="legend__value num" id="legInterest">—</span>
             </li>
             <li>
               <span class="dot dot--insurance"></span>
-              <span class="legend__label">Sığorta</span>
+              <span class="legend__label" data-i18n="leg_insurance">Sığorta</span>
               <span class="legend__pct num" id="legInsurancePct">0%</span>
-              <span class="legend__value num" id="legInsurance">0,00 ₼</span>
+              <span class="legend__value num" id="legInsurance">—</span>
             </li>
           </ul>
         </div>
 
         <details class="card sched rise" style="--d:.36s">
           <summary class="sched__sum">
-            <span class="eyebrow">Ödəniş cədvəli</span>
+            <span class="eyebrow" data-i18n="sched_title">Ödəniş cədvəli</span>
             <span class="sched__meta" id="schedMeta"></span>
             <span class="chev" aria-hidden="true"></span>
           </summary>
           <div class="sched__wrap">
             <table class="stab">
-              <caption>Aktiv plan üzrə cədvəl. Məbləğlər ₼ ilə.</caption>
+              <caption id="schedCaption">Aktiv plan üzrə cədvəl. Məbləğlər ₼ ilə.</caption>
               <thead>
                 <tr>
-                  <th scope="col">№</th>
-                  <th scope="col">Tarix</th>
-                  <th scope="col">Ödəniş</th>
-                  <th scope="col">Əsas borc</th>
-                  <th scope="col">Faiz</th>
-                  <th scope="col">Qalıq</th>
+                  <th scope="col" data-i18n="sc_no">№</th>
+                  <th scope="col" data-i18n="sc_date">Tarix</th>
+                  <th scope="col" data-i18n="sc_pay">Ödəniş</th>
+                  <th scope="col" data-i18n="sc_principal">Əsas borc</th>
+                  <th scope="col" data-i18n="sc_interest">Faiz</th>
+                  <th scope="col" data-i18n="sc_balance">Qalıq</th>
                 </tr>
               </thead>
               <tbody id="schedBody"></tbody>
@@ -578,8 +616,8 @@
     </main>
 
     <footer class="footer">
-      <p>Bütün hesablamalar cihazınızda aparılır; heç bir məlumat göndərilmir. Səhifə internetsiz də işləyir.</p>
-      <p>Nəticələr ilkin qiymətləndirmə üçündür və bankın rəsmi ödəniş cədvəlindən fərqlənə bilər.</p>
+      <p data-i18n="foot1">Bütün hesablamalar cihazınızda aparılır; heç bir məlumat göndərilmir. Səhifə internetsiz də işləyir.</p>
+      <p data-i18n="foot2">Nəticələr ilkin qiymətləndirmə üçündür və bankın rəsmi ödəniş cədvəlindən fərqlənə bilər.</p>
     </footer>
   </div>
 
@@ -594,6 +632,105 @@
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var heroAnimating = false;
     var revealed = false;
+
+    /* ---------- i18n ---------- */
+    var I18N = {
+      az: {
+        sep_group:' ', sep_decimal:',',
+        mast_eyebrow:'Kredit planlaşdırma', mast_title:'Kredit kalkulyatoru',
+        mast_sub:'Aylıq real ödənişinizi — kredit və sığortanı birlikdə — hesablayın və əlavə ödənişlərlə nə qədər vaxta və pula qənaət etdiyinizi dəqiq görün.',
+        ui_language:'Dil', ui_currency:'Valyuta',
+        grp_loan:'Kredit', f_amount:'Kredit məbləği', f_rate:'İllik faiz', f_term:'Müddət', f_firstDate:'İlk ödəniş tarixi',
+        grp_extra:'Əlavə ödənişlər', grp_extra_hint:'İstəyə bağlı. Əsas borca yönəlir və müddəti qısaldır — aylıq ödənişi azaltmır.',
+        f_extraMonthly:'Aylıq əlavə ödəniş', f_lumpSum:'Birdəfəlik əlavə', f_lumpMonth:'Neçənci ay', ph_lumpMonth:'məs. 12',
+        grp_ins:'Sığorta', grp_ins_hint:'Aylıq haqlar, kredit ödənişinin üstünə əlavə olunur.', f_prop:'Əmlak sığortası', f_life:'Həyat sığortası',
+        note_head:'Sığorta və erkən bağlanma',
+        note_body:'Həyat sığortasının son il hissəsi əvvəlcədən ödənilir, ona görə ilkin ödənişlər bir qədər yüksək olur. Qanuna görə kredit vaxtından əvvəl bağlanarsa, istifadə olunmamış hissə geri qaytarılır — buna görə erkən bağlanma sığortaya da qənaət edir.',
+        hero_eyebrow:'Real aylıq ödəniş', hero_prompt:'Kredit məbləği, illik faiz və müddəti daxil edin.',
+        savings_eyebrow:'Əlavə ödənişlə qənaət', savings_prompt:'Əlavə ödəniş əlavə edin və qənaətinizi görün.',
+        cmp_eyebrow:'Əlavəsiz və əlavə ilə', cmp_base:'Əlavəsiz', cmp_plan:'Əlavə ilə',
+        cmp_term:'Müddət', cmp_interest:'Ödənilən faiz', cmp_insurance:'Ödənilən sığorta', cmp_total:'Real ümumi xərc',
+        costs_eyebrow:'Xərcin tərkibi', costs_hint:'Əlavə ödəniş planı',
+        leg_principal:'Əsas borc', leg_interest:'Faiz', leg_insurance:'Sığorta',
+        sched_title:'Ödəniş cədvəli',
+        sc_no:'№', sc_date:'Tarix', sc_pay:'Ödəniş', sc_principal:'Əsas borc', sc_interest:'Faiz', sc_balance:'Qalıq',
+        foot1:'Bütün hesablamalar cihazınızda aparılır; heç bir məlumat göndərilmir. Səhifə internetsiz də işləyir.',
+        foot2:'Nəticələr ilkin qiymətləndirmə üçündür və bankın rəsmi ödəniş cədvəlindən fərqlənə bilər.',
+        unit_month:'ay', dur_year:'il', dur_month:'ay',
+        bar_aria:'Real ümumi xərcin əsas borc, faiz və sığorta üzrə bölgüsü',
+        heroBreak:function(m,ins){ return 'Kredit <b>'+m+'</b> + Sığorta <b>'+ins+'</b>'; },
+        savingsCap:function(dur,date){ return 'Krediti <b>'+dur+'</b> tez bağlayır'+(date?' · bağlanma <b>'+date+'</b>':'')+'.'; },
+        schedMeta:function(n,date){ return n+' ödəniş'+(date?' · '+date:''); },
+        schedCaption:function(cur){ return 'Aktiv plan üzrə cədvəl. Məbləğlər '+cur+' ilə.'; },
+        lumpDefault:'Birdəfəlik məbləğin kreditin neçənci ayında ödənildiyini bildirir — 1 = ilk ay, 12 = bir il sonra.',
+        lumpSet:function(month,date){ return 'Birdəfəlik məbləğ kreditin <b>'+month+'.</b> ayında ödənilir'+(date?' — təxminən <b>'+date+'</b>':'')+'.'; },
+        lumpWarn:function(month,term){ return 'Diqqət: '+month+'. ay '+term+' aylıq müddətdən kənardır — birdəfəlik ödəniş tətbiq olunmayacaq.'; }
+      },
+      ru: {
+        sep_group:' ', sep_decimal:',',
+        mast_eyebrow:'Кредитное планирование', mast_title:'Кредитный калькулятор',
+        mast_sub:'Рассчитайте реальный ежемесячный платёж — кредит и страховку вместе — и точно узнайте, сколько времени и денег экономят досрочные платежи.',
+        ui_language:'Язык', ui_currency:'Валюта',
+        grp_loan:'Кредит', f_amount:'Сумма кредита', f_rate:'Годовая ставка', f_term:'Срок', f_firstDate:'Дата первого платежа',
+        grp_extra:'Досрочные платежи', grp_extra_hint:'Необязательно. Идёт на основной долг и сокращает срок — ежемесячный платёж не уменьшается.',
+        f_extraMonthly:'Ежемесячный доп. платёж', f_lumpSum:'Разовый платёж', f_lumpMonth:'В каком месяце', ph_lumpMonth:'напр. 12',
+        grp_ins:'Страховка', grp_ins_hint:'Ежемесячные взносы, добавляются к платежу по кредиту.', f_prop:'Страховка имущества', f_life:'Страхование жизни',
+        note_head:'Страховка и досрочное погашение',
+        note_body:'Часть страхования жизни за последний год оплачивается заранее, поэтому первые платежи немного выше. По закону при досрочном погашении неиспользованная часть возвращается — поэтому досрочное погашение экономит и на страховке.',
+        hero_eyebrow:'Реальный ежемесячный платёж', hero_prompt:'Введите сумму кредита, годовую ставку и срок.',
+        savings_eyebrow:'Экономия от досрочных платежей', savings_prompt:'Добавьте досрочный платёж, чтобы увидеть экономию.',
+        cmp_eyebrow:'Без доплат и с доплатами', cmp_base:'Без доплат', cmp_plan:'С доплатами',
+        cmp_term:'Срок', cmp_interest:'Выплаченные проценты', cmp_insurance:'Выплаченная страховка', cmp_total:'Реальная общая стоимость',
+        costs_eyebrow:'Структура расходов', costs_hint:'План с доплатами',
+        leg_principal:'Основной долг', leg_interest:'Проценты', leg_insurance:'Страховка',
+        sched_title:'График платежей',
+        sc_no:'№', sc_date:'Дата', sc_pay:'Платёж', sc_principal:'Основной долг', sc_interest:'Проценты', sc_balance:'Остаток',
+        foot1:'Все расчёты выполняются на вашем устройстве; данные никуда не отправляются. Страница работает и без интернета.',
+        foot2:'Результаты предварительные и могут отличаться от официального графика банка.',
+        unit_month:'мес.', dur_year:'г.', dur_month:'мес.',
+        bar_aria:'Распределение реальной общей стоимости: основной долг, проценты и страховка',
+        heroBreak:function(m,ins){ return 'Кредит <b>'+m+'</b> + Страховка <b>'+ins+'</b>'; },
+        savingsCap:function(dur,date){ return 'Кредит закрывается на <b>'+dur+'</b> раньше'+(date?' · дата закрытия <b>'+date+'</b>':'')+'.'; },
+        schedMeta:function(n,date){ return n+' платежей'+(date?' · '+date:''); },
+        schedCaption:function(cur){ return 'График по активному плану. Суммы в '+cur+'.'; },
+        lumpDefault:'Указывает, в каком месяце кредита вносится разовый платёж — 1 = первый месяц, 12 = через год.',
+        lumpSet:function(month,date){ return 'Разовый платёж вносится в <b>'+month+'-м</b> месяце кредита'+(date?' — примерно <b>'+date+'</b>':'')+'.'; },
+        lumpWarn:function(month,term){ return 'Внимание: '+month+'-й месяц за пределами срока ('+term+' мес.) — разовый платёж не будет применён.'; }
+      },
+      en: {
+        sep_group:',', sep_decimal:'.',
+        mast_eyebrow:'Loan planning', mast_title:'Loan calculator',
+        mast_sub:'Work out your real monthly payment — loan and insurance together — and see exactly how much time and money extra payments save.',
+        ui_language:'Language', ui_currency:'Currency',
+        grp_loan:'Loan', f_amount:'Loan amount', f_rate:'Annual rate', f_term:'Term', f_firstDate:'First payment date',
+        grp_extra:'Extra payments', grp_extra_hint:'Optional. Goes toward principal and shortens the term — it never lowers the monthly payment.',
+        f_extraMonthly:'Monthly extra payment', f_lumpSum:'One-time extra', f_lumpMonth:'Which month', ph_lumpMonth:'e.g. 12',
+        grp_ins:'Insurance', grp_ins_hint:'Monthly premiums, added on top of the loan payment.', f_prop:'Property insurance', f_life:'Life insurance',
+        note_head:'Insurance and early payoff',
+        note_body:'The final year of life insurance is collected upfront, so early payments are slightly higher. By law, if the loan is repaid early the unused part is refunded — so an early payoff saves on insurance too.',
+        hero_eyebrow:'Real monthly payment', hero_prompt:'Enter the loan amount, annual rate and term.',
+        savings_eyebrow:'Savings from extra payments', savings_prompt:'Add an extra payment to see your savings.',
+        cmp_eyebrow:'Without vs with extra', cmp_base:'Without', cmp_plan:'With extra',
+        cmp_term:'Term', cmp_interest:'Interest paid', cmp_insurance:'Insurance paid', cmp_total:'Real total cost',
+        costs_eyebrow:'Cost breakdown', costs_hint:'With-extra plan',
+        leg_principal:'Principal', leg_interest:'Interest', leg_insurance:'Insurance',
+        sched_title:'Payment schedule',
+        sc_no:'No.', sc_date:'Date', sc_pay:'Payment', sc_principal:'Principal', sc_interest:'Interest', sc_balance:'Balance',
+        foot1:'All calculations run on your device; nothing is sent anywhere. The page works offline too.',
+        foot2:'Results are an initial estimate and may differ from the bank’s official schedule.',
+        unit_month:'mo', dur_year:'y', dur_month:'mo',
+        bar_aria:'Breakdown of the real total cost into principal, interest and insurance',
+        heroBreak:function(m,ins){ return 'Loan <b>'+m+'</b> + Insurance <b>'+ins+'</b>'; },
+        savingsCap:function(dur,date){ return 'Pays off <b>'+dur+'</b> sooner'+(date?' · payoff <b>'+date+'</b>':'')+'.'; },
+        schedMeta:function(n,date){ return n+' payments'+(date?' · '+date:''); },
+        schedCaption:function(cur){ return 'Schedule for the active plan. Amounts in '+cur+'.'; },
+        lumpDefault:'Sets which month of the loan the one-time payment is made — 1 = first month, 12 = after one year.',
+        lumpSet:function(month,date){ return 'The one-time amount is paid in month <b>'+month+'</b> of the loan'+(date?' — around <b>'+date+'</b>':'')+'.'; },
+        lumpWarn:function(month,term){ return 'Note: month '+month+' is beyond the '+term+'-month term — the one-time payment will not apply.'; }
+      }
+    };
+    var t = I18N.az;
+    var curSymbol = '₼', grpSep = ' ', decSep = ',';
 
     /* ---------- math ---------- */
     function round2(x){ return Math.round((x + Number.EPSILON) * 100) / 100; }
@@ -647,20 +784,21 @@
       n = Math.abs(n);
       var fixed = n.toFixed(dec);
       var parts = fixed.split('.');
-      var int = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-      var out = parts.length > 1 ? int + ',' + parts[1] : int;
+      var int = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, grpSep);
+      var out = parts.length > 1 ? int + decSep + parts[1] : int;
       return (neg ? '-' : '') + out;
     }
-    function money(n, dec){ return fmtNum(n, dec) + ' ₼'; }
+    function money(n, dec){ return fmtNum(n, dec) + ' ' + curSymbol; }
+    function monthsLabel(n){ return n + ' ' + t.unit_month; }
 
     function fmtDuration(months){
       months = Math.max(0, Math.round(months));
       var y = Math.floor(months / 12);
       var m = months % 12;
       var parts = [];
-      if (y > 0) parts.push(y + ' il');
-      if (m > 0) parts.push(m + ' ay');
-      if (parts.length === 0) parts.push('0 ay');
+      if (y > 0) parts.push(y + ' ' + t.dur_year);
+      if (m > 0) parts.push(m + ' ' + t.dur_month);
+      if (parts.length === 0) parts.push('0 ' + t.dur_month);
       return parts.join(' ');
     }
 
@@ -718,7 +856,8 @@
       segPrincipal: $('segPrincipal'), segInterest: $('segInterest'), segInsurance: $('segInsurance'),
       legPrincipal: $('legPrincipal'), legInterest: $('legInterest'), legInsurance: $('legInsurance'),
       legPrincipalPct: $('legPrincipalPct'), legInterestPct: $('legInterestPct'), legInsurancePct: $('legInsurancePct'),
-      schedMeta: $('schedMeta'), schedBody: $('schedBody')
+      schedMeta: $('schedMeta'), schedBody: $('schedBody'), schedCaption: $('schedCaption'),
+      costBar: $('costBar'), lang: $('lang'), currency: $('currency')
     };
 
     function readNum(el, def, min){
@@ -732,15 +871,13 @@
       var el = els.lumpHelp, warn = false, txt;
       if (lumpSum > 0 && lumpMonth >= 1) {
         if (termFilled && lumpMonth > term) {
-          txt = 'Diqqət: ' + lumpMonth + '. ay ' + term + ' aylıq müddətdən kənardır — birdəfəlik ödəniş tətbiq olunmayacaq.';
+          txt = t.lumpWarn(lumpMonth, term);
           warn = true;
         } else {
-          txt = 'Birdəfəlik məbləğ kreditin <b>' + lumpMonth + '.</b> ayında ödənilir';
-          if (firstDate) txt += ' — təxminən <b>' + fmtDate(addMonths(firstDate, lumpMonth - 1)) + '</b>';
-          txt += '.';
+          txt = t.lumpSet(lumpMonth, firstDate ? fmtDate(addMonths(firstDate, lumpMonth - 1)) : null);
         }
       } else {
-        txt = 'Birdəfəlik məbləğin kreditin neçənci ayında ödənildiyini bildirir — 1 = ilk ay, 12 = bir il sonra.';
+        txt = t.lumpDefault;
       }
       el.innerHTML = txt;
       el.classList.toggle('field-help--warn', warn);
@@ -772,7 +909,7 @@
       if (!ready) {
         heroAnimating = false;
         els.realMonthly.textContent = '—';
-        els.realBreak.textContent = 'Kredit məbləği, illik faiz və müddəti daxil edin.';
+        els.realBreak.textContent = t.hero_prompt;
         return;
       }
 
@@ -807,19 +944,18 @@
         els.realMonthly.textContent = fmtNum(realMonthly, 2);
         els.totalSaved.textContent = fmtNum(totalSaved, 2);
       }
-      els.realBreak.innerHTML = 'Kredit <b>' + money(M) + '</b> + Sığorta <b>' + money(monthlyInsurance) + '</b>';
+      els.realBreak.innerHTML = t.heroBreak(money(M), money(monthlyInsurance));
 
       /* savings */
       if (monthsSaved > 0) {
-        els.savingsCap.innerHTML = 'Krediti <b>' + fmtDuration(monthsSaved) + '</b> tez bağlayır' +
-          (payoff ? ' · bağlanma <b>' + fmtDate(payoff) + '</b>' : '') + '.';
+        els.savingsCap.innerHTML = t.savingsCap(fmtDuration(monthsSaved), payoff ? fmtDate(payoff) : null);
       } else {
-        els.savingsCap.textContent = 'Əlavə ödəniş əlavə edin və qənaətinizi görün.';
+        els.savingsCap.textContent = t.savings_prompt;
       }
 
       /* comparison (baseline vs plan; qənaət deltalarla göstərilir) */
-      els.cmpBaseTerm.textContent = base.months + ' ay';
-      els.cmpPlanTerm.textContent = plan.months + ' ay';
+      els.cmpBaseTerm.textContent = monthsLabel(base.months);
+      els.cmpPlanTerm.textContent = monthsLabel(plan.months);
       els.cmpBaseInterest.textContent = money(base.totalInterest);
       els.cmpPlanInterest.textContent = money(plan.totalInterest);
       els.cmpBaseInsurance.textContent = money(baseIns);
@@ -851,7 +987,8 @@
       els.legInsurancePct.textContent = fmtNum(sPct, 1) + '%';
 
       /* schedule (active plan) */
-      els.schedMeta.textContent = plan.months + ' ödəniş' + (payoff ? ' · ' + fmtDate(payoff) : '');
+      els.schedMeta.textContent = t.schedMeta(plan.months, payoff ? fmtDate(payoff) : null);
+      els.schedCaption.textContent = t.schedCaption(curSymbol);
       var rows = [];
       for (var i = 0; i < plan.schedule.length; i++) {
         var s = plan.schedule[i];
@@ -863,13 +1000,54 @@
       els.schedBody.innerHTML = rows.join('');
     }
 
-    /* wire up live recompute */
+    /* ---------- language & currency ---------- */
+    function applyStaticText(){
+      var nodes = document.querySelectorAll('[data-i18n]');
+      for (var i = 0; i < nodes.length; i++) {
+        var key = nodes[i].getAttribute('data-i18n');
+        if (typeof t[key] === 'string') nodes[i].textContent = t[key];
+      }
+      els.lumpMonth.setAttribute('placeholder', t.ph_lumpMonth);
+      els.costBar.setAttribute('aria-label', t.bar_aria);
+    }
+    function setLang(lang){
+      if (!I18N[lang]) lang = 'az';
+      t = I18N[lang];
+      grpSep = t.sep_group; decSep = t.sep_decimal;
+      document.documentElement.lang = lang;
+      applyStaticText();
+      try { localStorage.setItem('kk_lang', lang); } catch (e) {}
+    }
+    function setCurrency(code){
+      var opt = els.currency.querySelector('option[value="' + code + '"]');
+      curSymbol = opt ? opt.getAttribute('data-sym') : '₼';
+      var curs = document.querySelectorAll('[data-cur]');
+      for (var i = 0; i < curs.length; i++) curs[i].textContent = curSymbol;
+      try { localStorage.setItem('kk_cur', code); } catch (e) {}
+    }
+
+    /* ---------- wire up ---------- */
+    els.lang.addEventListener('change', function(){ setLang(this.value); recompute(); });
+    els.currency.addEventListener('change', function(){ setCurrency(this.value); recompute(); });
+
     var inputs = document.querySelectorAll('#form input');
     for (var k = 0; k < inputs.length; k++) {
       inputs[k].addEventListener('input', function(){ recompute(); });
       inputs[k].addEventListener('change', function(){ recompute(); });
     }
 
+    /* ---------- init (restore saved preferences) ---------- */
+    var savedLang = 'az', savedCur = 'AZN';
+    try {
+      savedLang = localStorage.getItem('kk_lang') || 'az';
+      savedCur = localStorage.getItem('kk_cur') || 'AZN';
+    } catch (e) {}
+    if (!I18N[savedLang]) savedLang = 'az';
+    if (!els.currency.querySelector('option[value="' + savedCur + '"]')) savedCur = 'AZN';
+    els.lang.value = savedLang;
+    els.currency.value = savedCur;
+    setLang(savedLang);
+    setCurrency(savedCur);
     recompute();
   })();
   </script>
