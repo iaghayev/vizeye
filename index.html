@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kredit kalkulyatoru</title>
+<title>İpoteka və kreditlərdə əlavə ödəniş kalkulyatoru</title>
 <meta name="description" content="İpoteka və kredit üçün real aylıq ödənişi, sığortanı və əlavə ödənişlərlə vaxt və pul qənaətini hesablayan kalkulyator.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,7 +65,7 @@
 
   /* ---- Masthead / topbar ---- */
   .topbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px 24px; flex-wrap:wrap; margin-bottom:clamp(14px,2.2vw,22px); }
-  .masthead{ max-width:62ch; }
+  .masthead{ flex:1 1 auto; min-width:0; }
   .controls{ display:flex; gap:10px; flex-wrap:wrap; flex:none; }
   .control{ display:flex; flex-direction:column; gap:5px; }
   .control__label{ font-size:10px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); padding-left:2px; }
@@ -90,19 +90,19 @@
   }
   .masthead__eyebrow{ color:var(--accent); display:inline-flex; align-items:center; gap:8px; }
   .masthead__eyebrow::before{ content:""; width:16px; height:2px; border-radius:2px; background:var(--accent); }
-  .brandline{ display:flex; align-items:center; gap:12px; margin:.45em 0 .32em; }
+  .brandline{ display:flex; align-items:flex-start; gap:11px; margin:.45em 0 .34em; }
   .brand{
-    width:34px; height:34px; flex:none; border-radius:10px; background-color:var(--accent);
+    width:32px; height:32px; flex:none; margin-top:2px; border-radius:9px; background-color:var(--accent);
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='%23EAF3EE'%3E%3Crect x='4' y='14' width='4' height='6' rx='1.4'/%3E%3Crect x='10' y='10' width='4' height='10' rx='1.4'/%3E%3Crect x='16' y='6' width='4' height='14' rx='1.4'/%3E%3C/g%3E%3C/svg%3E");
-    background-repeat:no-repeat; background-position:center; background-size:21px;
+    background-repeat:no-repeat; background-position:center; background-size:20px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.28), inset 0 0 0 1px rgba(255,255,255,.07), inset 0 -7px 12px -7px rgba(0,0,0,.35), 0 5px 12px -5px rgba(14,72,55,.45);
   }
   .masthead__title{
     margin:0;
-    font-size:clamp(1.45rem,3.4vw,2rem);
+    font-size:clamp(1.32rem,2.8vw,1.7rem);
     font-weight:700;
-    letter-spacing:-.02em;
-    line-height:1.08;
+    letter-spacing:-.018em;
+    line-height:1.12;
   }
   .masthead__sub{
     margin:0;
@@ -396,7 +396,7 @@
         <p class="eyebrow masthead__eyebrow" data-i18n="mast_eyebrow">Kredit planlaşdırma</p>
         <div class="brandline">
           <span class="brand" aria-hidden="true"></span>
-          <h1 class="masthead__title" data-i18n="mast_title">Kredit kalkulyatoru</h1>
+          <h1 class="masthead__title" data-i18n="mast_title">İpoteka və kreditlərdə əlavə ödəniş kalkulyatoru</h1>
         </div>
         <p class="masthead__sub" data-i18n="mast_sub">Aylıq real ödənişinizi — kredit və sığortanı birlikdə — hesablayın və əlavə ödənişlərlə nə qədər vaxta və pula qənaət etdiyinizi dəqiq görün.</p>
       </div>
@@ -660,7 +660,7 @@
     var I18N = {
       az: {
         sep_group:' ', sep_decimal:',',
-        mast_eyebrow:'Kredit planlaşdırma', mast_title:'Kredit kalkulyatoru',
+        mast_eyebrow:'Kredit planlaşdırma', mast_title:'İpoteka və kreditlərdə əlavə ödəniş kalkulyatoru',
         mast_sub:'Aylıq real ödənişinizi — kredit və sığortanı birlikdə — hesablayın və əlavə ödənişlərlə nə qədər vaxta və pula qənaət etdiyinizi dəqiq görün.',
         ui_language:'Dil', ui_currency:'Valyuta',
         grp_loan:'Kredit', f_amount:'Kredit məbləği', f_rate:'İllik faiz', f_term:'Müddət', f_firstDate:'İlk ödəniş tarixi',
@@ -691,7 +691,7 @@
       },
       ru: {
         sep_group:' ', sep_decimal:',',
-        mast_eyebrow:'Кредитное планирование', mast_title:'Кредитный калькулятор',
+        mast_eyebrow:'Кредитное планирование', mast_title:'Калькулятор досрочных платежей по ипотеке и кредитам',
         mast_sub:'Рассчитайте реальный ежемесячный платёж — кредит и страховку вместе — и точно узнайте, сколько времени и денег экономят досрочные платежи.',
         ui_language:'Язык', ui_currency:'Валюта',
         grp_loan:'Кредит', f_amount:'Сумма кредита', f_rate:'Годовая ставка', f_term:'Срок', f_firstDate:'Дата первого платежа',
@@ -722,7 +722,7 @@
       },
       en: {
         sep_group:',', sep_decimal:'.',
-        mast_eyebrow:'Loan planning', mast_title:'Loan calculator',
+        mast_eyebrow:'Loan planning', mast_title:'Extra payment calculator for mortgages and loans',
         mast_sub:'Work out your real monthly payment — loan and insurance together — and see exactly how much time and money extra payments save.',
         ui_language:'Language', ui_currency:'Currency',
         grp_loan:'Loan', f_amount:'Loan amount', f_rate:'Annual rate', f_term:'Term', f_firstDate:'First payment date',
@@ -1038,6 +1038,7 @@
       t = I18N[lang];
       grpSep = t.sep_group; decSep = t.sep_decimal;
       document.documentElement.lang = lang;
+      document.title = t.mast_title;
       applyStaticText();
       try { localStorage.setItem('kk_lang', lang); } catch (e) {}
     }
