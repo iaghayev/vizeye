@@ -28,8 +28,8 @@
     --accent-wash:rgba(17,106,80,0.06);
     --accent-ring:rgba(17,106,80,0.16);
 
-    --shadow-soft:0 1px 2px rgba(20,32,28,.04), 0 8px 20px -10px rgba(20,32,28,.12), 0 26px 50px -26px rgba(20,32,28,.12);
-    --shadow-hero:0 2px 4px rgba(20,32,28,.06), 0 16px 32px -12px rgba(14,72,55,.20), 0 34px 64px -30px rgba(14,72,55,.26);
+    --shadow-soft:0 1px 2px rgba(20,32,28,.05), 0 10px 24px -12px rgba(20,32,28,.13), 0 30px 56px -28px rgba(20,32,28,.13);
+    --shadow-hero:0 2px 4px rgba(20,32,28,.07), 0 18px 36px -14px rgba(14,72,55,.24), 0 40px 72px -32px rgba(14,72,55,.30);
 
     --r-card:20px;
     --r-shell:24px;
@@ -88,9 +88,17 @@
     text-transform:uppercase;
     color:var(--muted);
   }
-  .masthead__eyebrow{ color:var(--accent); }
+  .masthead__eyebrow{ color:var(--accent); display:inline-flex; align-items:center; gap:8px; }
+  .masthead__eyebrow::before{ content:""; width:16px; height:2px; border-radius:2px; background:var(--accent); }
+  .brandline{ display:flex; align-items:center; gap:12px; margin:.45em 0 .32em; }
+  .brand{
+    width:34px; height:34px; flex:none; border-radius:10px; background-color:var(--accent);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='%23EAF3EE'%3E%3Crect x='4' y='14' width='4' height='6' rx='1.4'/%3E%3Crect x='10' y='10' width='4' height='10' rx='1.4'/%3E%3Crect x='16' y='6' width='4' height='14' rx='1.4'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:center; background-size:21px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28), inset 0 0 0 1px rgba(255,255,255,.07), inset 0 -7px 12px -7px rgba(0,0,0,.35), 0 5px 12px -5px rgba(14,72,55,.45);
+  }
   .masthead__title{
-    margin:.34em 0 .2em;
+    margin:0;
     font-size:clamp(1.45rem,3.4vw,2rem);
     font-weight:700;
     letter-spacing:-.02em;
@@ -142,15 +150,23 @@
     box-shadow:var(--shadow-hero);
   }
   .hero__core{
+    position:relative;
     background:var(--accent);
     border-radius:var(--r-core);
     padding:clamp(18px,2.4vw,26px) clamp(20px,2.6vw,28px) clamp(16px,2vw,22px);
     color:#fff;
     box-shadow:
-      inset 0 1.5px 0 0 rgba(255,255,255,.20),
-      inset 0 0 0 1px rgba(255,255,255,.05),
-      inset 0 -14px 28px -14px rgba(0,0,0,.34);
+      inset 0 1.5px 0 0 rgba(255,255,255,.24),
+      inset 0 0 0 1px rgba(255,255,255,.06),
+      inset 0 2px 12px -6px rgba(255,255,255,.18),
+      inset 0 -18px 32px -16px rgba(0,0,0,.40);
   }
+  .hero__core::after{
+    content:""; position:absolute; inset:6px; border-radius:13px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+    pointer-events:none;
+  }
+  .hero__core > *{ position:relative; z-index:1; }
   .hero__eyebrow{
     margin:0 0 .55em;
     font-size:11px;
@@ -168,8 +184,10 @@
   }
   .hero__cur{ font-size:.42em; font-weight:600; margin-left:.12em; color:rgba(255,255,255,.82); }
   .hero__break{
-    margin:.8em 0 0;
-    color:rgba(255,255,255,.78);
+    margin:.85em 0 0;
+    padding-top:.85em;
+    border-top:1px solid rgba(255,255,255,.16);
+    color:rgba(255,255,255,.80);
     font-size:clamp(.82rem,1.4vw,.92rem);
     font-weight:500;
     line-height:1.45;
@@ -178,6 +196,7 @@
   /* empty (pre-fill) state */
   body:not(.ready) .results{ display:none; }
   body:not(.ready) .hero__cur{ display:none; }
+  body:not(.ready) .hero__break{ border-top:0; padding-top:0; }
   body:not(.ready) .hero__figure{
     font-size:clamp(1.25rem,3vw,1.6rem);
     font-weight:600;
@@ -242,8 +261,8 @@
   /* ---- Savings (accent card) ---- */
   .card--accent{
     background:var(--accent-wash);
-    border-color:rgba(17,106,80,.20);
-    box-shadow:0 1px 2px rgba(20,32,28,.04), 0 10px 26px -14px rgba(14,72,55,.22);
+    border-color:rgba(17,106,80,.24);
+    box-shadow:0 1px 2px rgba(20,32,28,.04), 0 12px 30px -16px rgba(14,72,55,.26), inset 0 0 0 1px rgba(17,106,80,.05);
   }
   .eyebrow--accent{ color:var(--accent); }
   .savings__figure{
@@ -278,19 +297,20 @@
   .ctab .cell-plan{ background:var(--accent-wash); }
   .ctab__total th, .ctab__total td{ border-top:1.5px solid var(--line-strong); }
   .ctab__total th{ color:var(--ink); font-weight:600; }
-  .delta{ display:block; margin-top:3px; font-size:12px; font-weight:600; color:var(--accent); letter-spacing:0; }
+  .delta{ display:inline-block; margin-top:5px; font-size:11.5px; font-weight:700; color:var(--accent); letter-spacing:0; background:rgba(17,106,80,.10); padding:2px 7px; border-radius:999px; }
 
   /* ---- Cost composition bar ---- */
   .card__hint{ font-size:12px; color:var(--muted); font-weight:500; }
   .bar{
     display:flex;
-    height:14px;
+    height:16px;
     border-radius:999px;
     overflow:hidden;
     background:var(--field);
     box-shadow:inset 0 0 0 1px var(--line);
   }
   .bar__seg{ height:100%; min-width:0; transition:width .6s var(--ease); }
+  .bar__seg + .bar__seg{ box-shadow:inset 2px 0 0 0 var(--card); }
   .seg--principal{ background:var(--principal); }
   .seg--interest{ background:var(--bronze); }
   .seg--insurance{ background:var(--slate); }
@@ -374,7 +394,10 @@
     <header class="topbar rise" style="--d:0s">
       <div class="masthead">
         <p class="eyebrow masthead__eyebrow" data-i18n="mast_eyebrow">Kredit planlaşdırma</p>
-        <h1 class="masthead__title" data-i18n="mast_title">Kredit kalkulyatoru</h1>
+        <div class="brandline">
+          <span class="brand" aria-hidden="true"></span>
+          <h1 class="masthead__title" data-i18n="mast_title">Kredit kalkulyatoru</h1>
+        </div>
         <p class="masthead__sub" data-i18n="mast_sub">Aylıq real ödənişinizi — kredit və sığortanı birlikdə — hesablayın və əlavə ödənişlərlə nə qədər vaxta və pula qənaət etdiyinizi dəqiq görün.</p>
       </div>
       <div class="controls">
